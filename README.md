@@ -1,4 +1,4 @@
-# IBus-Speech-To-Text
+# IBus Speech To Text Engine
 A speech to text IBus engine using VOSK written in Python.
 One of the main adavantages is that VOSK does not rely on any online service and voice recognition is done on the local computer.
 
