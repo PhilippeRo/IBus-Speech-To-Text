@@ -50,11 +50,13 @@ class STTSegment():
         return False
 
 class STTProcessContext():
+    _w2n=STTWordsToDigits()
+
     def __init__(self, context=None):
         if context == None:
             self._mode=STTParseModes.DICTATION
             self._case=STTCase.NONE
-            self._w2n=STTWordsToDigits()
+            self._use_digits=False
             self._first=None
             self._last=None
             return
@@ -68,12 +70,12 @@ class STTProcessContext():
 
         self._mode=self._first._mode
         self._case=self._first._case
-        self._w2n=self._first._w2n
+        self._use_digits=self._first._use_digits
 
         self._last=context
 
     def changed(self):
-        if self._mode != self._last._mode or self._w2n != self._last._w2n:
+        if self._mode != self._last._mode or self._use_digits != self._last._use_digits:
             return True
 
         return False
@@ -146,11 +148,11 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
 
     @property
     def use_digits(self):
-        return self._context._w2n.active
+        return self._context._use_digits
 
     @use_digits.setter
     def use_digits(self, use_digits):
-        self._context._w2n.use_digits(use_digits)
+        self._context._use_digits=use_digits
 
     def _init_text(self):
         self._last_segment = STTSegment()
@@ -287,10 +289,11 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
                 word_i = new_word_i
                 continue
 
-            new_word_i = self._context._w2n.parse(self, words, word_i)
-            if new_word_i != word_i:
-                word_i = new_word_i
-                continue
+            if self._context._use_digits == True:
+                new_word_i = self._context._w2n.parse(self, words, word_i)
+                if new_word_i != word_i:
+                    word_i = new_word_i
+                    continue
 
             # Nothing found in tree and no number, no match, keep word
             self._append_word(words[word_i])

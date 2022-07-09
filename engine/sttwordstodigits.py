@@ -55,7 +55,6 @@ class STTWordsToDigits():
         self._w2n={}
         self._n2w={}
 
-        self.active=False
         self.can_use_digits=False
 
     def _init_for_locale(self):
@@ -153,17 +152,7 @@ class STTWordsToDigits():
 
         return None
 
-    def use_digits(self, use_digits):
-        if self.can_use_digits == False:
-            LOG_MSG.warning("cannot use digits, install W2N module")
-            return
-
-        self.active = use_digits
-
     def parse(self, parser, words, word_i):
-        if self.active == False:
-            return word_i
-
         max_word_num=len(words)
 
         # What follows is adapted from original function
