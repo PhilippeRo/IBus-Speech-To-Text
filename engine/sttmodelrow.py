@@ -68,7 +68,7 @@ class STTModelRow(Adw.ActionRow):
             self.check_button.set_group(None)
 
     def _update_progress_bar(self):
-        if int(self._desc.download_progress) >= int(STTDownloadState.ONGOING):
+        if self._desc.download_progress >= STTDownloadState.ONGOING:
             self.progress_bar.set_fraction(self._desc.download_progress)
             return True
 

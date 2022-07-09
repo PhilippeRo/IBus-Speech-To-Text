@@ -22,7 +22,7 @@ import logging
 from re import search
 from pathlib import Path
 import urllib.request
-from enum import IntEnum
+from enum import Enum
 import tempfile
 import shutil
 import uuid
@@ -49,7 +49,7 @@ def _helper_locale_normalize(locale_str):
     lang2=locale_str[3:5]
     return lang+"_"+lang2.upper()
 
-class STTDownloadState(IntEnum):
+class STTDownloadState(float, Enum):
     STOPPED = -1.0
     UNKNOWN_PROGRESS = -0.5
     UNPACKING = -0.6
