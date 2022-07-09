@@ -60,7 +60,7 @@
         "description" : "Capitalize the first letters of each word"
         }, {
         "value" : "capitalize",
-        "utterances" : "capitalise",
+        "utterances" : "capitalize",
         "description" : "Capital letter"
         }, {
         "value" : "lower",
