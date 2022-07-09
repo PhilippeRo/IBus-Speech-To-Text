@@ -1,0 +1,53 @@
+# vim:set et sts=4 sw=4:
+#
+# ibus-stt - Speech To Text engine for IBus
+# Copyright (C) 2022 Philippe Rouquier <bonfire-app@wanadoo.fr>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import os
+
+from gettext import gettext as _
+
+import gi
+
+from gi.repository import GLib
+from gi.repository import Gio
+
+
+def stt_utils_get_ibus_name():
+    return "org.freedesktop.IBus.STT"
+
+def stt_utils_get_ibus_path():
+    return "/org/freedesktop/IBus/STT"
+
+def stt_utils_get_local_config_path():
+    return os.path.join(GLib.get_user_config_dir(), "@project_name@")
+
+def stt_utils_get_system_data_path():
+    return "@datadir@"
+
+def stt_utils_get_app_id():
+    return "@appid@"
+
+def stt_utils_get_version():
+    return "@version@"
+
+def stt_utils_get_license():
+    return "@license@"
+
+def stt_utils_get_libexec():
+    return "@libexec@"
+
+def stt_utils_ibus_component_description_path():
+    return os.path.join("@ibuscomponentpath@", "stt.xml")

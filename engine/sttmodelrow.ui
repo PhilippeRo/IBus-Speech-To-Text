@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<interface>
+  <requires lib="gtk+" version="4.0"/>
+  <template class="STTModelRow" parent="AdwActionRow">
+    <property name="selectable">False</property>
+    <property name="activatable">True</property>
+    <property name="activatable-widget">check_button</property>
+    <child type="prefix">
+      <object class="GtkCheckButton" id="check_button">
+        <property name="valign">center</property>
+        <signal name="toggled" handler="check_button_toggled_cb"/>
+      </object>
+    </child>
+    <child type="suffix">
+      <object class="GtkProgressBar" id="progress_bar">
+        <property name="halign">fill</property>
+        <property name="valign">center</property>
+        <property name="hexpand">1</property>
+        <property name="vexpand">1</property>
+        <property name="show-text">True</property>
+        <property name="visible">False</property>
+        <property name="text" translatable="yes">Downloading Model</property>
+      </object>
+    </child>
+    <child type="suffix">
+      <object class="GtkButton" id="model_button">
+        <property name="visible">True</property>
+        <property name="halign">end</property>
+        <property name="valign">center</property>
+        <property name="icon_name">folder-download-symbolic</property>
+        <property name="use-underline">True</property>
+        <signal name="clicked" handler="_download_model_button_clicked_cb"/>
+        <style>
+          <class name="circular"/>
+          <class name="flat"/>
+        </style>
+      </object>
+    </child>
+  </template>
+</interface>

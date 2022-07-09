@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="inputmethod">
+	<name translatable="no">org.freedesktop.IBus.STT</name>
+	<description>Speech To Text Component</description>
+	<exec>@libexecdir@/ibus-engine-stt --ibus</exec>
+	<version>@version@</version>
+	<author>Philippe Rouquier</author>
+	<license>GPL</license>
+	<homepage>https://github.com/PhilippeRo/ibus-stt</homepage>
+	<textdomain>ibus-stt</textdomain>
+  <observed-paths>
+    <path>@datadir@</path>
+  </observed-paths>
+
+	<engines>
+		<engine>
+			<name>stt</name>
+			<language>t</language>
+			<license>GPL</license>
+			<author>Philippe Rouquier</author>
+			<icon>audio-input-microphone</icon>
+			<layout>default</layout>
+			<symbol>🗣</symbol>
+			<longname>Speech To Text</longname>
+			<description>Speech To Text Input Method</description>
+			<rank>0</rank>
+		</engine>
+	</engines>
+</component>

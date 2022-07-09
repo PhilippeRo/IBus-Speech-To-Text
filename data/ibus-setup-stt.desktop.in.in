@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=IBus Speech to Text
+Comment=Set IBus Speech to Text Preferences
+Exec=@libexecdir@/ibus-setup-stt
+Icon=user-available-symbolic
+NoDisplay=true
+Type=Application
+StartupNotify=true

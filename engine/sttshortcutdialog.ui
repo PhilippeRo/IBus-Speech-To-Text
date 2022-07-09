@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="STTShortcutDialog" parent="GtkDialog">
+    <property name="modal">True</property>
+    <property name="title" translatable="yes">Shortcut Editing</property>
+    <child>
+      <object class="GtkScrolledWindow">
+        <property name="hscrollbar-policy">never</property>
+        <property name="propagate-natural-height">1</property>
+        <property name="child">
+          <object class="GtkStack" id="contents">
+            <property name="hexpand">1</property>
+            <property name="vexpand">1</property>
+            <property name="hhomogeneous">1</property>
+            <property name="vhomogeneous">1</property>
+            <property name="transition_type">slide-left-right</property>
+            <child>
+              <object class="GtkStackPage" id="page1">
+                <property name="name">global</property>
+                <property name="child">
+                  <object class="AdwClamp">
+                    <property name="child">
+                      <object class="GtkBox">
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">12</property>
+                        <property name="margin-top">12</property>
+                        <property name="margin-bottom">12</property>
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">12</property>
+                        <child>
+                          <object class="AdwPreferencesGroup" id="desc_label">
+                            <property name="title" translatable="yes">Description</property>
+                            <child>
+                              <object class="GtkEntry" id="description_entry">
+                                <property name="hexpand">1</property>
+                                <property name="activates-default">1</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="AdwPreferencesGroup" id="text_label">
+                            <property name="title" translatable="yes">Text</property>
+                            <child>
+                              <object class="GtkScrolledWindow">
+                                <property name="has-frame">1</property>
+                                <property name="propagate-natural-height">1</property>
+                                <property name="propagate-natural-width">1</property>
+                                <child>
+                                  <object class="GtkTextView" id="text_view">
+                                    <property name="bottom-margin">12</property>
+                                    <property name="top-margin">6</property>
+                                    <property name="left-margin">6</property>
+                                    <property name="right-margin">12</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                        <object class="AdwPreferencesGroup" id="utterance_list">
+                          <property name="title" translatable="yes">Utterances</property>
+                          <property name="header-suffix">
+                            <object class="GtkBox">
+                              <property name="orientation">horizontal</property>
+                              <child>
+                                <object class="GtkButton" id="new_alternative_utterances_button">
+                                  <property name="icon_name">microphone-sensitivity-high-symbolic</property>
+                                  <style>
+                                    <class name="flat" />
+                                  </style>
+                                  <signal name="clicked" handler="new_alternative_utterances_button_clicked_cb"/>
+                                </object>
+                              </child>
+                              <child>
+                                <object class="GtkButton" id="new_utterance_button">
+                                  <property name="icon_name">list-add-symbolic</property>
+                                  <style>
+                                    <class name="flat" />
+                                  </style>
+                                  <signal name="clicked" handler="new_utterance_button_clicked_cb"/>
+                                </object>
+                              </child>
+                            </object>
+                          </property>
+                        </object> <!--utterancelist-->
+                      </child>
+                    </object> <!--box-->
+                  </property>
+                </object>
+              </property>
+            </object> <!--stackpage-->
+          </child>
+
+          <child>
+            <object class="GtkStackPage" id="page2">
+              <property name="name">utterance</property>
+              <property name="child">
+                <object class="GtkBox">
+                  <property name="hexpand">1</property>
+                  <property name="vexpand">1</property>
+                  <property name="margin-start">18</property>
+                  <property name="margin-end">18</property>
+                  <property name="margin-top">18</property>
+                  <property name="margin-bottom">18</property>
+                  <property name="orientation">vertical</property>
+                  <property name="spacing">6</property>
+                  <child>
+                    <object class="GtkLabel">
+                      <property name="hexpand">1</property>
+                      <property name="xalign">0</property>
+                      <property name="label" translatable="yes">Type a new utterance or correct the existing one</property>
+                    </object>
+                  </child>
+                  <child>
+                    <object class="GtkEntry" id="utterance_entry">
+                      <property name="hexpand">1</property>
+                      <property name="secondary-icon-activatable">0</property>
+                    </object>
+                  </child>
+                </object>
+              </property>
+            </object>
+          </child>
+
+          <child>
+            <object class="GtkStackPage" id="page3">
+              <property name="name">utterance_recognition</property>
+              <property name="child">
+                <object class="GtkBox">
+                  <property name="hexpand">1</property>
+                  <property name="vexpand">1</property>
+                  <property name="margin-start">18</property>
+                  <property name="margin-end">18</property>
+                  <property name="margin-top">18</property>
+                  <property name="margin-bottom">18</property>
+                  <property name="orientation">vertical</property>
+                  <property name="spacing">12</property>
+                  <child>
+                    <object class="GtkLabel">
+                      <property name="hexpand">1</property>
+                      <property name="xalign">0.5</property>
+                      <property name="label" translatable="yes">Speak to add new utterances</property>
+                      <attributes>
+                        <attribute name="weight" value="bold" />
+                        <attribute name="scale" value="1.25"/>
+                      </attributes>
+                      <style>
+                        <class name="dim-label"/>
+                      </style>
+                    </object>
+                  </child>
+                  <child>
+                    <object class="GtkBox">
+                      <property name="orientation">horizontal</property>
+                      <child>
+                        <object class="GtkButton" id="recognize_toggle">
+                          <property name="icon-name">microphone-sensitivity-high-symbolic</property>
+                          <property name="valign">center</property>
+                          <property name="halign">center</property>
+                          <property name="hexpand">1</property>
+                          <property name="height-request">64</property>
+                          <property name="width-request">64</property>
+                          <signal name="clicked" handler="recognize_alternatives_clicked_cb"/>
+                          <style>
+                            <class name="circular"/>
+                          </style>
+                        </object>
+                      </child>
+                    </object>
+                  </child>
+                  <child>
+                    <object class="AdwClamp">
+                      <property name="child">
+                        <object class="GtkListBox" id="alternatives_list">
+                          <style>
+                            <class name="boxed-list" />
+                          </style>
+                        </object>
+                      </property>
+                    </object>
+                  </child>
+                </object>
+              </property>
+            </object>
+          </child>
+          </object><!-- stack-->
+        </property>
+      </object>
+    </child>
+
+    <child type="titlebar">
+      <object class="GtkHeaderBar" id="header">
+        <property name="show_title_buttons">False</property>
+        <property name="visible">1</property>
+
+        <!-- when creating a new one-->
+        <child type="start">
+          <object class="GtkStack" id="button_stack_start">
+            <property name="visible">1</property>
+            <property name="transition_type">slide-left-right</property>
+            <property name="hhomogeneous">0</property>
+            <property name="vhomogeneous">0</property>
+
+            <child type="action">
+              <object class="GtkButton" id="cancel_button">
+                <property name="visible">1</property>
+                <property name="label" translatable="yes">Cancel</property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkButton" id="previous_button">
+                <property name="icon_name">go-previous-symbolic</property>
+                <signal name="clicked" handler="previous_button_clicked_cb"/>
+                <style>
+                  <class name="image-button"/>
+                </style>
+              </object>
+            </child>
+
+          </object>
+        </child>
+
+        <child type="end">
+          <object class="GtkStack" id="button_stack_end">
+            <property name="transition_type">slide-left-right</property>
+            <property name="hhomogeneous">0</property>
+            <property name="vhomogeneous">0</property>
+
+            <child>
+               <object class="GtkButton" id="add_utterance_button">
+                <property name="label" translatable="yes">Add Utterance</property>
+                <signal name="clicked" handler="add_utterance_button_clicked_cb"/>
+                <style>
+                  <class name="suggested-action" />
+                </style>
+              </object>
+            </child>
+
+            <child>
+               <object class="GtkButton" id="apply_utterance_button">
+                <property name="label" translatable="yes">Apply Changes</property>
+                 <signal name="clicked" handler="apply_utterance_button_clicked_cb"/>
+                <style>
+                  <class name="suggested-action" />
+                </style>
+              </object>
+            </child>
+
+            <child type="action">
+               <object class="GtkButton" id="add_button">
+                <property name="label" translatable="yes">Add Shortcurt</property>
+                <style>
+                  <class name="suggested-action" />
+                </style>
+              </object>
+            </child>
+
+            <child type="action">
+              <object class="GtkButton" id="apply_button">
+                <property name="label" translatable="yes">Apply Changes</property>
+              </object>
+            </child>
+
+          </object>
+        </child>
+
+      </object>
+    </child>
+
+    <action-widgets>
+      <action-widget response="cancel">cancel_button</action-widget>
+      <action-widget response="ok" default="true">add_button</action-widget>
+      <action-widget response="apply" default="true">apply_button</action-widget>
+    </action-widgets>
+
+  </template>
+
+  <object class="GtkSizeGroup">
+    <widgets>
+      <widget name="cancel_button"/>
+      <widget name="add_button"/>
+      <widget name="apply_button"/>
+    </widgets>
+  </object>
+
+</interface>

@@ -1,0 +1,64 @@
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="STTModelChooserDialog" parent="GtkDialog">
+    <property name="modal">True</property>
+    <property name="default-width">600</property>
+    <property name="default-height">400</property>
+    <property name="title" translatable="yes">Manage Recognition Models</property>
+    <child>
+      <object class="GtkScrolledWindow">
+        <property name="vexpand">True</property>
+        <property name="hscrollbar_policy">never</property>
+        <property name="propagate_natural_height">True</property>
+        <property name="child">
+          <object class="AdwClamp">
+            <property name="child">
+              <object class="GtkBox">
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">12</property>
+                <child>
+                  <object class="AdwPreferencesGroup" id="model_list">
+                    <property name="margin-start">12</property>
+                    <property name="margin-end">12</property>
+                    <property name="margin-top">12</property>
+                    <property name="margin-bottom">12</property>
+                    <property name="title" translatable="yes">Available models</property>
+                    <property name="description" translatable="yes">A recognition model is required for recognition to proceed with the current locale. Larger models are usually more accurate but require more memory.</property>
+                    <property name="header-suffix">
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkButton" id="new_model_button">
+                            <property name="valign">1</property>
+                            <property name="icon_name">list-add-symbolic</property>
+                            <style>
+                              <class name="flat" />
+                            </style>
+                            <signal name="clicked" handler="new_model_button_clicked_cb"/>
+                          </object>
+                        </child>
+                      </object>
+                    </property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkCheckButton" id="obsolete_button">
+                    <property name="margin-start">12</property>
+                    <property name="margin-end">12</property>
+                    <property name="label" translatable="yes">Show obsolete models</property>
+                    <property name="active">0</property>
+                    <signal name="toggled" handler="obsolete_button_toggled_cb"/>
+                  </object>
+                </child>
+              </object>
+            </property>
+          </object>
+        </property>
+      </object>
+    </child>
+  </template>
+</interface>

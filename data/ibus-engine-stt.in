@@ -1,0 +1,8 @@
+#!/bin/sh
+# vim:set noet ts=4:
+#
+# ibus-stt - Speech to text engine for IBus
+#
+
+exec @python@ @datadir@/main.py $@
+

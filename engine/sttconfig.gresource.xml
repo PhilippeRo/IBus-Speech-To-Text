@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/freedesktop/ibus/engine/stt/config">
+    <file preprocess="xml-stripblanks">sttconfigdialog.ui</file>
+    <file preprocess="xml-stripblanks">sttlocalerow.ui</file>
+    <file preprocess="xml-stripblanks">sttshortcutdialog.ui</file>
+    <file preprocess="xml-stripblanks">sttshortcutrow.ui</file>
+    <file preprocess="xml-stripblanks">sttutterancerow.ui</file>
+    <file preprocess="xml-stripblanks">sttmodelchooserdialog.ui</file>
+    <file preprocess="xml-stripblanks">sttmodelrow.ui</file>
+  </gresource>
+</gresources>

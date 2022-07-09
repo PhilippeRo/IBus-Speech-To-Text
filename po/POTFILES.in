@@ -1,0 +1,14 @@
+engine/main.py
+engine/sttengine.py
+engine/sttutils.py.in
+engine/sttconfigdialog.ui
+engine/sttconfigdialog.py
+engine/sttlocalerow.ui
+engine/sttlocalerow.py
+engine/sttmodelchooserdialog.ui
+engine/sttmodelchooserdialog.py
+engine/sttshortcutdialog.ui
+engine/sttshortcutdialog.py
+data/ibus-setup-stt.desktop.in.in
+data/stt.appdata.xml.in.in
+data/org.freedesktop.ibus.engine.stt.gschema.xml.in

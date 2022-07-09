@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.freedesktop.ibus.engine.stt" path="/org/freedesktop/ibus/engine/stt/">
+    <key name="active-on-start" type="b">
+      <default>false</default>
+      <summary>Start voice recognition as soon as the engine is enabled</summary>
+      <description>Start voice recognition as soon as the engine is enabled.</description>
+    </key>
+    <key name="preload" type="b">
+      <default>false</default>
+      <summary>Preload the recognition engine's model to start more quickly when enabled</summary>
+      <description>Preload the recognition engine to start more quickly when enabled. There is a drawback though as most of the time engines' models require a lot of memory.</description>
+    </key>
+    <key type="b" name="stop-on-keypress">
+      <default>false</default>
+      <summary>Stop voice recognition if a key is pressed</summary>
+      <description>Stop voice recognition if a key is pressed</description>
+    </key>
+    <key type="s" name="locale">
+      <summary>Locale used</summary>
+      <default>'None'</default>
+      <description>Sets the currently used locale</description>
+    </key>
+    <key type="s" name="vosk-models">
+      <summary>Paths to VOSK models</summary>
+      <default>'None'</default>
+      <description>A JSON formatted string that is used to associate locales with their models. It can be the name of a model if it is in default monitored paths or a custom path.</description>
+    </key>
+    <key type="s" name="locale-paths">
+      <summary>Paths to formatting files</summary>
+      <default>'None'</default>
+      <description>A JSON formatted string that is used to associate locales with a formatting file (used for automatic formatting of output). It is a custom path or nothing for defaut path.</description>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<interface>
+  <requires lib="gtk+" version="4.0"/>
+  <template class="STTShortcutRow" parent="AdwActionRow">
+    <property name="selectable">False</property>
+    <property name="activatable">True</property>
+    <property name="title-lines">1</property>
+    <property name="subtitle-lines">1</property>
+
+    <child>
+      <object class="GtkStack" id="main_stack">
+        <property name="hhomogeneous">1</property>
+        <property name="vhomogeneous">1</property>
+        <property name="transition_type">slide-left-right</property>
+        <child>
+          <object class="GtkButton" id="remove_button">
+            <property name="valign">center</property>
+            <property name="icon_name">edit-clear-symbolic</property>
+            <property name="use-underline">True</property>
+            <signal name="clicked" handler="remove_button_clicked_cb"/>
+            <style>
+              <class name="flat" />
+              <class name="circular"/>
+            </style>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkRevealer" id = "revealer">
+            <property name="transition-type">slide-right</property>
+            <child>
+
+              <object class="GtkButton" id="reset_button">
+                <property name="valign">center</property>
+                <property name="icon_name">view-refresh-symbolic</property>
+                <property name="use-underline">True</property>
+                <signal name="clicked" handler="reset_button_clicked_cb"/>
+                <style>
+                  <class name="flat" />
+                  <class name="circular"/>
+                </style>
+              </object>
+
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+
+  </template>
+</interface>
