@@ -120,9 +120,12 @@ class STTShortcutRow(Adw.ActionRow):
     @Gtk.Template.Callback()
     def reset_button_clicked_cb(self, button):
         self._description=self._original_description
+        # Reset must come before we reset _extra_utterances since the utterances
+        # has to be removed before.
+        self.emit("reset")
+
         self._extra_utterances=[]
         self.update()
-        self.emit("reset")
 
     def set_extra_utterances(self, utterances):
         self._extra_utterances=utterances

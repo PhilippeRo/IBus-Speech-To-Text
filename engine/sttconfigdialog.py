@@ -328,6 +328,10 @@ class STTConfigDialog (Adw.PreferencesWindow):
             self._current_locale.overriding=json_data
 
     def shortcut_row_reset_cb(self, row):
+        # After a row is reset remove extra utterances from global dictionary
+        for utterance in row._extra_utterances:
+            self._utterances_dict.pop(utterance)
+
         self._apply_change()
 
     def shortcut_row_deleted_cb(self, row):
