@@ -21,10 +21,14 @@
          }
     },
     "custom" : [{
-        "value" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nescio quo modo praetervolavit oratio. Illa argumenta propria videamus, cur omnia sint paria peccata. Negat esse eam, inquit, propter se expetendam. Duo Reges: constructio interrete. His similes sunt omnes, qui virtuti student levantur vitiis, levantur erroribus, nisi forte censes Ti. Atque his de rebus et splendida est eorum et illustris oratio. Quod idem cum vestri faciant, non satis magnam tribuunt inventoribus gratiam. Longum est enim ad omnia respondere, quae a te dicta sunt. Haec quo modo conveniant, non sane intellego. Ab his oratores, ab his imperatores ac rerum publicarum principes extiterunt.\n\nQuem si tenueris, non modo meum Ciceronem, sed etiam me ipsum abducas licebit. Tubulum fuisse, qua illum, cuius is condemnatus est rogatione, P. Negat esse eam, inquit, propter se expetendam. Quid dubitas igitur mutare principia naturae? Respondent extrema primis, media utrisque, omnia omnibus. Nec vero sum nescius esse utilitatem in historia, non modo voluptatem. Quid me istud rogas? Causa autem fuit huc veniendi ut quosdam hinc libros promerem.\n\nApparet statim, quae sint officia, quae actiones. Hoc etsi multimodis reprehendi potest, tamen accipio, quod dant. Quasi ego id curem, quid ille aiat aut neget. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Itaque sensibus rationem adiunxit et ratione effecta sensus non reliquit. Quid ergo aliud intellegetur nisi uti ne quae pars naturae neglegatur? Negare non possum. Sed quot homines, tot sententiae;",
-        "utterances" : ["example of shorcut"],
-        "description" : "An example of shortcut"
-    }],
+        "value": "I",
+        "description": "i -> I",
+        "utterances": ["i"]
+        }, {
+        "value": "I'm",
+        "description": "i'm -> I'm",
+        "utterances": ["i'm"]
+        }],
     "commands" : [{
         "value" : "digits",
         "utterances" : ["use digits"],
