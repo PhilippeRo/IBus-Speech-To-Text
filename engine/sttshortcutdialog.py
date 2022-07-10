@@ -287,6 +287,10 @@ class STTShortcutDialog(Gtk.Dialog):
 
         extra=[]
         for row in self._rows_list:
+            # All utterances cannot be removed nor changed
+            if row.text in self._row.utterances:
+                continue
+
             extra.append(row.text)
 
         self._row.set_extra_utterances(extra)

@@ -180,12 +180,12 @@ class STTUtteranceTree(GObject.Object):
         for utterance in utterances:
             node = self._add_to_tree(utterance)
             if node == None:
-                LOG_MSG.error("no node could be created")
+                LOG_MSG.error("no node could be created (%s)", utterance)
                 return
 
             if node._callback != None:
-                LOG_MSG.error("node already exists")
-                return
+                LOG_MSG.error("node already exists (%s)", utterance)
+                continue
 
             node._callback = callback
             node._value = value

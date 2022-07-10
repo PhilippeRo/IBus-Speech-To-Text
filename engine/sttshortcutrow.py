@@ -43,7 +43,6 @@ class STTShortcutRow(Adw.ActionRow):
         self._value=value
         self._description=description
         self._original_description=description
-        self.utterances=utterances
         if utterances == None:
             self.utterances=[]
         else:
