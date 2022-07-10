@@ -394,7 +394,7 @@ class STTShortcutDialog(Gtk.Dialog):
 
     def _new_utterance_row_delete_clicked_cb(self, button):
         row=button.get_parent()
-        while isinstance(row, Adw.ActionRow):
+        while not isinstance(row, Adw.ActionRow):
             row=row.get_parent()
             if row == None:
                 return
