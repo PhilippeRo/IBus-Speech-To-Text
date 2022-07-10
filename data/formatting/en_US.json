@@ -86,7 +86,7 @@
         "utterances" : ["period", "full stop"]
         }, {
         "value" : ";",
-        "utterances" : ["semi colon"]
+        "utterances" : ["semi colon", "semicolon", "semi-colon"]
         }, {
         "value" : ":",
         "utterances" : "colon"
