@@ -228,15 +228,16 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
                 # Allows to spell using the first letter of words (Alpha, ...)
                 word = word[0]
         else :
-            last_char=self._text_left[-1] if len(self._text_left) > 0 else ""
+            last_char=self._text_left[-1] if self._text_left != "" else ""
 
             if word not in self._parser.no_space_before and \
                last_char not in self._parser.no_space_after and \
                last_char != "":
                 self._segment._utterance += " "
 
-            if last_char.isspace() == True:
-                last_char=self._text_left[-2] if len(self._text_left) > 1 else ""
+            # Remove ALL white spaces
+            last_char=last_char.rstrip()
+            last_char=last_char if last_char == "" else last_char[-1]
 
             if (self._context._case & STTCase.LOWER) == 0 and \
                (last_char == "" or last_char in self._parser.capitalize_next):
