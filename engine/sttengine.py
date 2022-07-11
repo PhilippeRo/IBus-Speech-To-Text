@@ -50,6 +50,7 @@ class STTEngine(IBus.Engine):
         self._text_processor.connect("mode-changed", self._mode_changed)
 
         self._left_text=""
+        self._left_text_reset=True
 
         self._settings=Gio.Settings.new("org.freedesktop.ibus.engine.stt")
         self._settings.connect("changed::stop-on-keypress", self._stop_on_key_pressed_changed)
@@ -252,7 +253,6 @@ class STTEngine(IBus.Engine):
         if active_on_start == True:
             self._engine.run()
             self._update_state()
-            self._force_surrounding_text_update()
 
     def do_disable(self):
         LOG_MSG.info('disable %s', self)
@@ -327,7 +327,7 @@ class STTEngine(IBus.Engine):
             # Note: we accept "" (in case we need to remove previous partial text)
             ibus_text=IBus.Text.new_from_string(text)
             self.update_preedit_text_with_mode(ibus_text,
-                                               0,#ibus_text.get_length(),
+                                               0,
                                                True,
                                                IBus.PreeditFocusMode.CLEAR)
         else:
@@ -335,6 +335,10 @@ class STTEngine(IBus.Engine):
 
     def _got_text(self, engine, utterance):
         text = self._text_processor.utterance_process_end(utterance, self._left_text)
+        self.update_preedit_text_with_mode(IBus.Text.new_from_string(""),
+                                           0,
+                                           True,
+                                           IBus.PreeditFocusMode.CLEAR)
 
         # Handle potential pending cancellations
         # Note: once accessed pending_cancel_size is reset to 0
@@ -343,26 +347,29 @@ class STTEngine(IBus.Engine):
             if (self.client_capabilities & IBus.Capabilite.SURROUNDING_TEXT) == 0:
                 LOG_MSG.debug("client application has no surrounding capability")
 
-            # I don't know why delete_surrounding_text works better with this
-            self.update_preedit_text_with_mode(IBus.Text.new_from_string(""),
-                                               0,
-                                               True,
-                                               IBus.PreeditFocusMode.CLEAR)
             self.delete_surrounding_text(-cancel_length, cancel_length)
 
-        # Note : there could be text to write after cancellation ("cancel write
-        # this").
+            # Keep our left text updated
+            text_len=len(self._left_text)
+            text_len=text_len-cancel_length if cancel_length <= text_len else text_len
+            self._left_text=self._left_text[:text_len]
+
+        # Note : there could be text to write even after cancellation ("cancel
+        # write this").
         if text != "":
             self.commit_text(IBus.Text.new_from_string(text))
-
-        self._force_surrounding_text_update()
+            self._left_text+=text
+            self._left_text_reset=False
+            LOG_MSG.debug("current left text (%s)", self._left_text)
 
     def _reset(self):
         if self._engine.is_running():
             self._engine.get_final_results()
 
         self._text_processor.reset()
-        self._force_surrounding_text_update()
+        self._left_text=""
+        self._left_text_reset=True
+        self.commit_text(IBus.Text.new_from_string(""))
 
     def do_process_key_event(self, keyval, keycode, state):
         if (state & IBus.ModifierType.RELEASE_MASK) != 0:
@@ -379,27 +386,22 @@ class STTEngine(IBus.Engine):
         # Let the keystroke be propagated
         return False
 
-    def _force_surrounding_text_update(self):
-        LOG_MSG.debug("forcing update of surrounding text %i", self._engine.is_running())
-        if self._engine.is_running() == True:
-            ibus_text=IBus.Text.new_from_string(" ")
-            self.update_preedit_text_with_mode(ibus_text,
-                                               0, #ibus_text.get_length(),
-                                               True,
-                                               IBus.PreeditFocusMode.CLEAR)
-
     def _set_left_text(self, ibus_text, cursor_pos):
-        # Each text commit or preedit reliably sets the surrounding text.
-        # Problem is, preedit text is included.
+        # Each text commit or preedit may reliably (but not always for example
+        # gtk3 and gtk4) sets the surrounding text. Problem is, preedit text
+        # is included.
         text_bytes=ibus_text.get_text().encode()
-        self._left_text = text_bytes[:cursor_pos].decode("utf-8")
-        LOG_MSG.debug("left text changed (%s) (cursor pos=%i)", self._left_text, cursor_pos)
+        self._left_text=text_bytes[:cursor_pos].decode("utf-8")
+        LOG_MSG.debug("set left text (%s) (cursor pos=%i)", self._left_text, cursor_pos)
 
         # Reminder we do not care about the context on the right, it is up to
         # the user to add a potential missing whitespace.
 
     def do_set_surrounding_text(self, ibus_text, cursor_pos, anchor_pos):
-        self._set_left_text(ibus_text, cursor_pos)
+        LOG_MSG.debug("left text changed (%s) (cursor pos=%i)", ibus_text.get_text(), cursor_pos)
+
+        if self._left_text_reset == True:
+            self._set_left_text(ibus_text, cursor_pos)
 
         # We need to chain this function if we want get_surrounding_text to work
         IBus.Engine.do_set_surrounding_text(self, ibus_text, cursor_pos, anchor_pos)
