@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ibus-stt\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-29 11:23+0200\n"
+"POT-Creation-Date: 2022-07-15 15:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,100 +17,96 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: engine/main.py:281
+#: engine/main.py:177
 msgid "Executed by IBus"
 msgstr ""
 
-#: engine/main.py:288
+#: engine/main.py:184
 msgid "Daemonize"
 msgstr ""
 
-#: engine/sttengine.py:116 engine/sttengine.py:223
+#: engine/main.py:191
+msgid "Debug"
+msgstr ""
+
+#: engine/sttengine.py:68 engine/sttengine.py:201
 msgid "Recognition off"
 msgstr ""
 
-#: engine/sttengine.py:120 engine/sttengine.py:235
+#: engine/sttengine.py:72 engine/sttengine.py:213
 msgid "Toggle speech recognition"
 msgstr ""
 
-#: engine/sttengine.py:124 engine/sttengine.py:246
+#: engine/sttengine.py:76 engine/sttengine.py:224
 msgid "Dictate"
 msgstr ""
 
-#: engine/sttengine.py:127 engine/sttengine.py:250
+#: engine/sttengine.py:79 engine/sttengine.py:228
 msgid "Toggle dictation mode"
 msgstr ""
 
-#: engine/sttengine.py:129 engine/sttengine.py:254
+#: engine/sttengine.py:81 engine/sttengine.py:232
 msgid "Dictate (no formatting)"
 msgstr ""
 
-#: engine/sttengine.py:132 engine/sttengine.py:257
+#: engine/sttengine.py:84 engine/sttengine.py:235
 msgid "Toggle dictation mode with no automatic formatting"
 msgstr ""
 
-#: engine/sttengine.py:134 engine/sttengine.py:261
+#: engine/sttengine.py:86 engine/sttengine.py:239
 msgid "Spell"
 msgstr ""
 
-#: engine/sttengine.py:137 engine/sttengine.py:265
+#: engine/sttengine.py:89 engine/sttengine.py:243
 msgid "Toggle spelling mode"
 msgstr ""
 
-#: engine/sttengine.py:139
+#: engine/sttengine.py:91
 msgid "Recognition mode"
 msgstr ""
 
-#: engine/sttengine.py:146 engine/sttengine.py:270
+#: engine/sttengine.py:98 engine/sttengine.py:248
 msgid "Use digits"
 msgstr ""
 
-#: engine/sttengine.py:150 engine/sttengine.py:274
+#: engine/sttengine.py:102 engine/sttengine.py:252
 msgid "Toggle the use of digits"
 msgstr ""
 
-#: engine/sttengine.py:153
+#: engine/sttengine.py:105
 msgid "Settings"
 msgstr ""
 
-#: engine/sttengine.py:156
+#: engine/sttengine.py:108
 msgid "Configure IBus STT"
 msgstr ""
 
-#: engine/sttengine.py:158 engine/sttengine.py:368
+#: engine/sttengine.py:110 engine/sttengine.py:332
 msgid "About IBus Speech To Text"
 msgstr ""
 
-#: engine/sttengine.py:161
+#: engine/sttengine.py:113
 msgid "Learn more about IBus STT"
 msgstr ""
 
-#: engine/sttengine.py:220
+#: engine/sttengine.py:198
 msgid "Recognition on"
 msgstr ""
 
-#: engine/sttengine.py:239
+#: engine/sttengine.py:217
 msgid "Recognition modes"
 msgstr ""
 
-#: engine/sttengine.py:367
+#: engine/sttengine.py:331
 msgid "IBus Speech To Text"
 msgstr ""
 
-#: engine/sttengine.py:372
+#: engine/sttengine.py:336
 msgid "What you say is always write."
 msgstr ""
 
-#: engine/sttengine.py:375
+#: engine/sttengine.py:339
 msgid "translator-credits"
-msgstr ""
-
-#: engine/sttutils.py.in:60
-msgid "Toggle recording"
-msgstr ""
-
-#: engine/sttutils.py.in:67
-msgid "If IBus Speech to Text is running, reload user's utterances-map.json"
 msgstr ""
 
 #: engine/sttconfigdialog.ui:8
@@ -188,23 +184,23 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
-#: engine/sttconfigdialog.py:565
+#: engine/sttconfigdialog.py:569
 msgid ""
 "The file that defines automatic formatting for your locale does not have the "
 "proper format."
 msgstr ""
 
-#: engine/sttconfigdialog.py:567
+#: engine/sttconfigdialog.py:571
 msgid ""
 "A file that defines automatic formatting for your locale is missing. You can "
 "manually add one."
 msgstr ""
 
-#: engine/sttconfigdialog.py:580
+#: engine/sttconfigdialog.py:584
 msgid "There is no available model for the current locale"
 msgstr ""
 
-#: engine/sttconfigdialog.py:580
+#: engine/sttconfigdialog.py:584
 msgid "Download Model"
 msgstr ""
 
@@ -213,34 +209,34 @@ msgstr ""
 msgid "%s : system locale"
 msgstr ""
 
-#: engine/sttlocalerow.py:106
+#: engine/sttlocalerow.py:109
 msgid "No model downloaded yet"
 msgstr ""
 
-#: engine/sttlocalerow.py:111
+#: engine/sttlocalerow.py:114
 msgid "Custom model installed manually in a non-standard directory"
 msgstr ""
 
-#: engine/sttlocalerow.py:116
+#: engine/sttlocalerow.py:119
 msgid "unknown size"
-msgstr ""
-
-#: engine/sttlocalerow.py:122
-#, python-format
-msgid "This model is obsolete - %s"
 msgstr ""
 
 #: engine/sttlocalerow.py:125
 #, python-format
+msgid "This model is obsolete - %s"
+msgstr ""
+
+#: engine/sttlocalerow.py:128
+#, python-format
 msgid "Large model that may be more accurate than smaller ones - %s"
 msgstr ""
 
-#: engine/sttlocalerow.py:127
+#: engine/sttlocalerow.py:130
 #, python-format
 msgid "Lightweight model for Android and RPi - %s"
 msgstr ""
 
-#: engine/sttlocalerow.py:129
+#: engine/sttlocalerow.py:132
 msgid ""
 "No description available for the current model (name not found in online "
 "database)"
@@ -341,30 +337,46 @@ msgstr ""
 msgid "Stop voice recognition if a key is pressed"
 msgstr ""
 
-#: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:20
-msgid "Locale used"
+#: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:21
+msgid "Display partial results"
 msgstr ""
 
 #: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:22
-msgid "Sets the currently used locale"
+msgid "Use IBus preedit functionality to display partial results"
 msgstr ""
 
-#: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:25
-msgid "Paths to VOSK models"
+#: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:26
+msgid "Format partial results"
 msgstr ""
 
 #: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:27
+msgid "Format partial results as it is done for the final ones"
+msgstr ""
+
+#: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:30
+msgid "Locale used"
+msgstr ""
+
+#: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:32
+msgid "Sets the currently used locale"
+msgstr ""
+
+#: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:35
+msgid "Paths to VOSK models"
+msgstr ""
+
+#: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:37
 msgid ""
 "A JSON formatted string that is used to associate locales with their models. "
 "It can be the name of a model if it is in default monitored paths or a "
 "custom path."
 msgstr ""
 
-#: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:30
+#: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:40
 msgid "Paths to formatting files"
 msgstr ""
 
-#: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:32
+#: data/org.freedesktop.ibus.engine.stt.gschema.xml.in:42
 msgid ""
 "A JSON formatted string that is used to associate locales with a formatting "
 "file (used for automatic formatting of output). It is a custom path or "

@@ -16,6 +16,16 @@
       <summary>Stop voice recognition if a key is pressed</summary>
       <description>Stop voice recognition if a key is pressed</description>
     </key>
+    <key type="b" name="preedit-text">
+      <default>true</default>
+      <summary>Display partial results</summary>
+      <description>Use IBus preedit functionality to display partial results</description>
+    </key>
+    <key type="b" name="format-preedit">
+      <default>true</default>
+      <summary>Format partial results</summary>
+      <description>Format partial results as it is done for the final ones</description>
+    </key>
     <key type="s" name="locale">
       <summary>Locale used</summary>
       <default>'None'</default>
