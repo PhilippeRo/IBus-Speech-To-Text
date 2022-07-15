@@ -33,7 +33,7 @@ class STTGstVosk(STTGstBase):
     __gtype_name__ = 'STTGstVosk'
 
     #slave-method=3 /                   "queue max-size-bytes=4294967295 ! " \
-    _pipeline_def="pulsesrc ! " \
+    _pipeline_def="pulsesrc blocksize=4410 ! " \
                   "queue2 max-size-bytes=4294967294 name=Buffer max-size-time=0 max-size-buffers=0 ! " \
                   "audioconvert ! " \
                   "audiorate ! " \
