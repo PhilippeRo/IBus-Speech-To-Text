@@ -155,7 +155,11 @@ class STTCurrentLocale(GObject.Object):
     @overriding.setter
     def overriding(self, json_data):
         json_path=self._default_overriding_file_path()
-        with open(json_path, "w") as json_file:
+
+        # Ensure the path to our directory has been created
+        json_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with json_path.open("w") as json_file:
             json.dump(json_data, json_file)
 
     def _set_locale(self, locale_str):
