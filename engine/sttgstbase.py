@@ -183,10 +183,6 @@ class STTGstBase (GObject.Object):
         self._target=STTEngineState.LOADED
         return self._stop_real()
 
-    def configure(self):
-        LOG_MSG.info("no configure available")
-        return False
-
     def get_final_results(self):
         LOG_MSG.info("get final results not implemented for this backend")
         return False
