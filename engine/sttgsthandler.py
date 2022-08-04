@@ -48,7 +48,7 @@ class STTGstHandler(GObject.Object):
 
     def set_pipeline(self, pipeline):
         if self._pipeline != None:
-            # Note: this will happend one day if we implement different engines.
+            # Note: this will happen one day if we implement different engines.
             # In the meantime, object has only one engine during its lifetime.
             self.__disconnect()
 
