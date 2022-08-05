@@ -337,7 +337,7 @@ class STTEngine(IBus.Engine):
                             copyright="Copyright © 2022 Philippe Rouquier",
                             comments=_("What you say is always write."),
                             website="https://github.com/PhilippeRo/ibus-stt",
-                            license=stt_utils_get_license(),
+                            license_type=Gtk.License.GPL_3_0,
                             translator_credits=_("translator-credits"))
             dialog.present()
 

@@ -44,7 +44,6 @@ utils_conf.set('ibuscomponentpath', ibusdir)
 utils_conf.set('appid', appid)
 utils_conf.set('libexec', libexecdir)
 utils_conf.set('version', meson.project_version())
-utils_conf.set('license', meson.project_license())
 
 configure_file(
   input: 'sttutils.py.in',
