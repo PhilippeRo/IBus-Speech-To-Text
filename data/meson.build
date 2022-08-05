@@ -55,7 +55,5 @@ configure_file(configuration: data_conf,
   install_dir: join_paths(datadir, 'glib-2.0/schemas'),
 )
 
-gnome.post_install(glib_compile_schemas : true, update_desktop_database : true)
-
 subdir('formatting')
 subdir('numbers')

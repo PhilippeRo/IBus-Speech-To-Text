@@ -27,8 +27,10 @@ ibus_dep = dependency ('ibus-1.0',
 
 dependency('libadwaita-1', version: '>= 1.0')
 
-# Post-install scripts
-meson.add_install_script('build-aux/meson_post_install.py')
+gnome.post_install(
+  glib_compile_schemas: true,
+  update_desktop_database: true,
+)
 
 subdir('engine')
 subdir('data')
