@@ -52,6 +52,8 @@ class STTEngine(IBus.Engine):
         self._left_text=""
         self._left_text_reset=True
 
+        self._preediting=False
+
         self._settings=Gio.Settings.new("org.freedesktop.ibus.engine.stt")
         self._settings.connect("changed::stop-on-keypress", self._stop_on_key_pressed_changed)
         self._stop_on_key_pressed=False
@@ -362,22 +364,26 @@ class STTEngine(IBus.Engine):
                                                0,
                                                True,
                                                IBus.PreeditFocusMode.CLEAR)
+            self._preediting=True
         else:
             self._engine.get_final_results()
 
     def _got_text(self, engine, utterance):
         text = self._text_processor.utterance_process_end(utterance, self._left_text)
-        self.update_preedit_text_with_mode(IBus.Text.new_from_string(""),
-                                           0,
-                                           True,
-                                           IBus.PreeditFocusMode.CLEAR)
+        if self._preediting == True:
+            # Don't call this if there was no preediting before
+            self.update_preedit_text_with_mode(IBus.Text.new_from_string(""),
+                                               0,
+                                               True,
+                                               IBus.PreeditFocusMode.CLEAR)
+            self._preediting=False
 
         # Handle potential pending cancellations
         # Note: once accessed pending_cancel_size is reset to 0
         cancel_length = self._text_processor.pending_cancel_size
         if cancel_length != 0:
             if (self.client_capabilities & IBus.Capabilite.SURROUNDING_TEXT) == 0:
-                LOG_MSG.debug("client application has no surrounding capability")
+                LOG_MSG.debug("client application has no surrounding text capability")
 
             self.delete_surrounding_text(-cancel_length, cancel_length)
 
@@ -401,7 +407,11 @@ class STTEngine(IBus.Engine):
         self._text_processor.reset()
         self._left_text=""
         self._left_text_reset=True
-        self.commit_text(IBus.Text.new_from_string(""))
+        # Note: we used to do this in the hope it would force update but there
+        # is a potential problem here: select text and click -> the selected
+        # text is deleted !!
+        # if self._engine.is_running() == True:
+        #     self.commit_text(IBus.Text.new_from_string(""))
 
     def do_process_key_event(self, keyval, keycode, state):
         if (state & IBus.ModifierType.RELEASE_MASK) != 0:

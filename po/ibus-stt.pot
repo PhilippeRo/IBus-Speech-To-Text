@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ibus-stt\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-15 15:34+0200\n"
+"POT-Creation-Date: 2022-07-23 20:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,83 +29,83 @@ msgstr ""
 msgid "Debug"
 msgstr ""
 
-#: engine/sttengine.py:68 engine/sttengine.py:201
+#: engine/sttengine.py:70 engine/sttengine.py:203
 msgid "Recognition off"
 msgstr ""
 
-#: engine/sttengine.py:72 engine/sttengine.py:213
+#: engine/sttengine.py:74 engine/sttengine.py:215
 msgid "Toggle speech recognition"
 msgstr ""
 
-#: engine/sttengine.py:76 engine/sttengine.py:224
+#: engine/sttengine.py:78 engine/sttengine.py:226
 msgid "Dictate"
 msgstr ""
 
-#: engine/sttengine.py:79 engine/sttengine.py:228
+#: engine/sttengine.py:81 engine/sttengine.py:230
 msgid "Toggle dictation mode"
 msgstr ""
 
-#: engine/sttengine.py:81 engine/sttengine.py:232
+#: engine/sttengine.py:83 engine/sttengine.py:234
 msgid "Dictate (no formatting)"
 msgstr ""
 
-#: engine/sttengine.py:84 engine/sttengine.py:235
+#: engine/sttengine.py:86 engine/sttengine.py:237
 msgid "Toggle dictation mode with no automatic formatting"
 msgstr ""
 
-#: engine/sttengine.py:86 engine/sttengine.py:239
+#: engine/sttengine.py:88 engine/sttengine.py:241
 msgid "Spell"
 msgstr ""
 
-#: engine/sttengine.py:89 engine/sttengine.py:243
+#: engine/sttengine.py:91 engine/sttengine.py:245
 msgid "Toggle spelling mode"
 msgstr ""
 
-#: engine/sttengine.py:91
+#: engine/sttengine.py:93
 msgid "Recognition mode"
 msgstr ""
 
-#: engine/sttengine.py:98 engine/sttengine.py:248
+#: engine/sttengine.py:100 engine/sttengine.py:250
 msgid "Use digits"
 msgstr ""
 
-#: engine/sttengine.py:102 engine/sttengine.py:252
+#: engine/sttengine.py:104 engine/sttengine.py:254
 msgid "Toggle the use of digits"
 msgstr ""
 
-#: engine/sttengine.py:105
+#: engine/sttengine.py:107
 msgid "Settings"
 msgstr ""
 
-#: engine/sttengine.py:108
+#: engine/sttengine.py:110
 msgid "Configure IBus STT"
 msgstr ""
 
-#: engine/sttengine.py:110 engine/sttengine.py:332
+#: engine/sttengine.py:112 engine/sttengine.py:334
 msgid "About IBus Speech To Text"
 msgstr ""
 
-#: engine/sttengine.py:113
+#: engine/sttengine.py:115
 msgid "Learn more about IBus STT"
 msgstr ""
 
-#: engine/sttengine.py:198
+#: engine/sttengine.py:200
 msgid "Recognition on"
 msgstr ""
 
-#: engine/sttengine.py:217
+#: engine/sttengine.py:219
 msgid "Recognition modes"
 msgstr ""
 
-#: engine/sttengine.py:331
+#: engine/sttengine.py:333
 msgid "IBus Speech To Text"
 msgstr ""
 
-#: engine/sttengine.py:336
+#: engine/sttengine.py:338
 msgid "What you say is always write."
 msgstr ""
 
-#: engine/sttengine.py:339
+#: engine/sttengine.py:341
 msgid "translator-credits"
 msgstr ""
 
@@ -298,6 +298,11 @@ msgstr ""
 
 #: engine/sttshortcutdialog.ui:255
 msgid "Add Shortcurt"
+msgstr ""
+
+#: engine/sttshortcutrow.py:111
+#, python-format
+msgid "Character <span weight='heavy'>%s</span>"
 msgstr ""
 
 #: data/ibus-setup-stt.desktop.in.in:3

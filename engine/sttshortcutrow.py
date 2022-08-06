@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from gettext import gettext as _
 
 import gi
 
@@ -107,7 +108,7 @@ class STTShortcutRow(Adw.ActionRow):
 
         title=title.strip()
         if len(title) == 1:
-            title = "Character <span weight='heavy'>" + title + "</span>"
+            title = _("Character <span weight='heavy'>%s</span>") % title
         elif title.count("\n") >= 1:
             title = title.split("\n", 1)[0] + " …"
 

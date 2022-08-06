@@ -27,7 +27,6 @@ gnome.compile_resources('ibus-engine-stt-config',
   install: true,
   install_dir: datadir / meson.project_name())
 
-
 foreach source : stt_sources
   configure_file(
     input: source,
@@ -54,3 +53,5 @@ configure_file(
   install: true,
   install_dir : datadir / meson.project_name()
 )
+
+meson.add_install_script(python_prog, '-m', 'compileall', datadir / meson.project_name())
