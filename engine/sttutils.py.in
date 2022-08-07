@@ -43,9 +43,6 @@ def stt_utils_get_app_id():
 def stt_utils_get_version():
     return "@version@"
 
-def stt_utils_get_license():
-    return "@license@"
-
 def stt_utils_get_libexec():
     return "@libexec@"
 
