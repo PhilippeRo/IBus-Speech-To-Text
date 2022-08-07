@@ -301,14 +301,18 @@ class STTUtteranceTree(GObject.Object):
     def _load_language(self, json_data):
         json_data = json_data.get("language")
         if json_data == None:
-            return False
+            LOG_MSG.debug("there is no language section")
+            return
 
-        self.no_space_after+=json_data.get("no space after", "")
-        self.no_space_before+=json_data.get("no space before", "")
-        self.capitalize_next+=json_data.get("capitalize next", "")
-        self.digits.update(json_data.get("digits"))
-
-        return True
+        # For all the following values, it has to be a complete override.
+        # Using a cumulative approach ("+=") would not work as it does not
+        # allow for removing characters previously set.
+        # All the more so, as there is a default value for the following three
+        # first values.
+        self.no_space_after=json_data.get("no space after", self.no_space_after)
+        self.no_space_before=json_data.get("no space before", self.no_space_before)
+        self.capitalize_next=json_data.get("capitalize next", self.capitalize_next)
+        self.digits=json_data.get("digits", self.digits)
 
     def _load_formatting_file(self):
         # Note: reset set formatting_file_valid to False
@@ -319,10 +323,9 @@ class STTUtteranceTree(GObject.Object):
         if json_data is None:
             return
 
-        if self._load_language(json_data) == False:
-            return
+        self._load_language(json_data)
 
-        # FIXME! should command be compulsory
+        # No section is compulsory
         self._load_commands_list(json_data.get("commands"))
         self._load_case_list(json_data.get("case"))
         self._load_diacritics_list(json_data.get("diacritics"))
@@ -341,6 +344,9 @@ class STTUtteranceTree(GObject.Object):
         if json_data is None:
             return
 
+        # Note: this is pure override it is not cumulative or additive
+        self._load_language(json_data)
+
         self._load_commands_list(json_data.get("commands"))
         self._load_case_list(json_data.get("case"))
         self._load_diacritics_list(json_data.get("diacritics"))
@@ -358,10 +364,14 @@ class STTUtteranceTree(GObject.Object):
         self.emit("changed")
 
     def reset(self):
+        # This dictionary, digits, is used only in spelling mode
         self.digits={}
-        self.no_space_before=""
-        self.no_space_after=""
-        self.capitalize_next=""
+
+        # These values are used for automatic formatting.
+        # We default to rules used for English but it can be overriden.
+        self.no_space_before=" ….,)]}'-\t\n?!;:"
+        self.no_space_after=" ([{@\n\t-"
+        self.capitalize_next=".?!…"
 
         self._root=STTWordNode(0)
 
