@@ -1,12 +1,10 @@
 {
     "description" : {
         "name" : "English (USA)",
-        "locale" : "en_US"
+        "locale" : "en_US",
+        "comment" : "For a more complete example of possible values, see fr_FR file"
     },
     "language" : {
-        "no space after" : " ([{@\n\t-",
-        "no space before" : " ….,)]}'-\t\n?!;:",
-        "capitalize next" : ".?!…",
         "digits" : {
             "one" : "1",
             "two" : "2",

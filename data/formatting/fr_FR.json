@@ -1,7 +1,8 @@
 {
     "description" : {
         "name" : "Français (France)",
-        "locale" : "fr_FR"
+        "locale" : "fr_FR",
+        "comment" : "This section is not used or displayed."
     },
     "language" : {
         "no space after" : " ([{@\n\t-",
@@ -18,7 +19,8 @@
             "huit" : "8",
             "neuf" : "9",
             "zéro" : "0"
-         }
+         },
+         "comment": "This section is used to set some characteristics of the language for auto-formatting."
     },
     "custom" : [{
         "value" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nescio quo modo praetervolavit oratio. Illa argumenta propria videamus, cur omnia sint paria peccata. Negat esse eam, inquit, propter se expetendam. Duo Reges: constructio interrete. His similes sunt omnes, qui virtuti student levantur vitiis, levantur erroribus, nisi forte censes Ti. Atque his de rebus et splendida est eorum et illustris oratio. Quod idem cum vestri faciant, non satis magnam tribuunt inventoribus gratiam. Longum est enim ad omnia respondere, quae a te dicta sunt. Haec quo modo conveniant, non sane intellego. Ab his oratores, ab his imperatores ac rerum publicarum principes extiterunt.\n\nQuem si tenueris, non modo meum Ciceronem, sed etiam me ipsum abducas licebit. Tubulum fuisse, qua illum, cuius is condemnatus est rogatione, P. Negat esse eam, inquit, propter se expetendam. Quid dubitas igitur mutare principia naturae? Respondent extrema primis, media utrisque, omnia omnibus. Nec vero sum nescius esse utilitatem in historia, non modo voluptatem. Quid me istud rogas? Causa autem fuit huc veniendi ut quosdam hinc libros promerem.\n\nApparet statim, quae sint officia, quae actiones. Hoc etsi multimodis reprehendi potest, tamen accipio, quod dant. Quasi ego id curem, quid ille aiat aut neget. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Itaque sensibus rationem adiunxit et ratione effecta sensus non reliquit. Quid ergo aliud intellegetur nisi uti ne quae pars naturae neglegatur? Negare non possum. Sed quot homines, tot sententiae;",
