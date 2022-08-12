@@ -42,7 +42,7 @@ class STTEngine(IBus.Engine):
     __gtype_name__ = 'STTEngine'
 
     def __init__(self):
-        super().__init__()
+        super().__init__(has_focus_id=True)
 
         LOG_MSG.info("STTEngine created %s", self)
 
@@ -296,6 +296,12 @@ class STTEngine(IBus.Engine):
         self.register_properties(self.__prop_list)
         self._update_state()
 
+        # This is to show that we want to get surrounding text.
+        # self.get_surrounding_text()
+
+    def do_focus_in_id(self, object_path, client):
+        do_focus_in(self)
+
     def do_focus_out(self):
         LOG_MSG.debug("focus out")
         self._reset()
@@ -420,6 +426,7 @@ class STTEngine(IBus.Engine):
                 self._update_state()
                 return False
 
+        if (state & IBus.ModifierType.RELEASE_MASK) != 0:
             # Any keystroke should stop a potential ongoing processing
             if self._text_processor.is_processing() == True:
                 self._engine.get_final_results()
@@ -440,7 +447,8 @@ class STTEngine(IBus.Engine):
         # the user to add a potential missing whitespace.
 
     def do_set_surrounding_text(self, ibus_text, cursor_pos, anchor_pos):
-        LOG_MSG.debug("left text changed (%s) (cursor pos=%i)", ibus_text.get_text(), cursor_pos)
+        LOG_MSG.debug("left text changed (%s) (cursor pos=%i, anchor_pos=%i)",
+                      ibus_text.get_text(), cursor_pos, anchor_pos)
 
         if self._left_text_reset == True:
             self._set_left_text(ibus_text, cursor_pos)
