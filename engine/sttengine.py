@@ -418,12 +418,17 @@ class STTEngine(IBus.Engine):
             if self._stop_on_key_pressed == True:
                 self._engine.stop()
                 self._update_state()
-                return False
-
+        else:
             # Any keystroke should stop a potential ongoing processing
             if self._text_processor.is_processing() == True:
                 self._engine.get_final_results()
-                return False
+
+            # Usually there is a "set-surrounding-text" event after a key press.
+            # So get ready for the update (though we keep our current one if
+            # none comes). This is in case the key press is an arrow that moved
+            # the cursor. Instead of tracking this kind of strokes, let IBus
+            # tell us how the surrounding text changed.
+            self._left_text_reset = True
 
         # Let the keystroke be propagated
         return False
@@ -440,7 +445,8 @@ class STTEngine(IBus.Engine):
         # the user to add a potential missing whitespace.
 
     def do_set_surrounding_text(self, ibus_text, cursor_pos, anchor_pos):
-        LOG_MSG.debug("left text changed (%s) (cursor pos=%i)", ibus_text.get_text(), cursor_pos)
+        LOG_MSG.debug("left text changed (%s) (cursor pos=%i, anchor_pos=%i)",
+                      ibus_text.get_text(), cursor_pos, anchor_pos)
 
         if self._left_text_reset == True:
             self._set_left_text(ibus_text, cursor_pos)
