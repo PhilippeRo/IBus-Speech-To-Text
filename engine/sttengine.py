@@ -42,7 +42,7 @@ class STTEngine(IBus.Engine):
     __gtype_name__ = 'STTEngine'
 
     def __init__(self):
-        super().__init__()
+        super().__init__(has_focus_id=True)
 
         LOG_MSG.info("STTEngine created %s", self)
 
@@ -296,6 +296,12 @@ class STTEngine(IBus.Engine):
         self.register_properties(self.__prop_list)
         self._update_state()
 
+        # This is to show that we want to get surrounding text.
+        # self.get_surrounding_text()
+
+    def do_focus_in_id(self, object_path, client):
+        do_focus_in(self)
+
     def do_focus_out(self):
         LOG_MSG.debug("focus out")
         self._reset()
@@ -418,7 +424,13 @@ class STTEngine(IBus.Engine):
             if self._stop_on_key_pressed == True:
                 self._engine.stop()
                 self._update_state()
+<<<<<<< HEAD
         else:
+=======
+                return False
+
+        if (state & IBus.ModifierType.RELEASE_MASK) != 0:
+>>>>>>> a8a65f0ee0bb2532beaa02ef8d4951647e2e74c7
             # Any keystroke should stop a potential ongoing processing
             if self._text_processor.is_processing() == True:
                 self._engine.get_final_results()
