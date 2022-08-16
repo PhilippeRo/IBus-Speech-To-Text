@@ -398,7 +398,7 @@ class STTEngine(IBus.Engine):
             self.commit_text(IBus.Text.new_from_string(text))
             self._left_text+=text
             self._left_text_reset=False
-            LOG_MSG.debug("current left text (%s)", self._left_text)
+            LOG_MSG.debug("current left text (after commit) (%s)", self._left_text)
 
     def _reset(self):
         if self._engine.is_running():
