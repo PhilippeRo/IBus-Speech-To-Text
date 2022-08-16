@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import unicodedata
 
 from gi.repository import GObject
 
@@ -249,7 +250,20 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
             word=word.capitalize()
 
         if self._segment._diacritic != None:
-            self._segment._utterance += self._segment._diacritic[1]
+            # Diacritics should be placed after the letter or some applications
+            # like libreoffice will not combine the diacritic and the letter.
+            letter=word[:1]
+
+            # Check if the letter is not already combined. It might happen in
+            # some cases that VOSK sends a combined character already; for
+            # example "à" in French which makes the diacritic "`" redundant if
+            # the user tried to add it.
+            uncombined_letter=unicodedata.decomposition(letter).split()
+            if uncombined_letter == [] or \
+               chr(int(uncombined_letter[1], base=16)) != self._segment._diacritic[1]:
+                letter=letter+self._segment._diacritic[1]
+
+            word=letter+word[1:]
             self._segment._diacritic = None
 
         self._segment._utterance += word
