@@ -275,6 +275,10 @@ class STTEngine(IBus.Engine):
         (ibus_text, cursor_pos, anchor_pos)=self.get_surrounding_text()
         self._set_left_text(ibus_text, cursor_pos)
 
+        # Allow for update of surrounding text by do_set_surrounding_text()
+        # though it is very unlikely it will be called at the moment.
+        self._left_text_reset=True
+
         self._connect_to_engine()
         if self._engine.has_model() == False:
             # There is something wrong with our model, display config dialog
