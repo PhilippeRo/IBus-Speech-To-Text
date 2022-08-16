@@ -55,7 +55,7 @@ class STTGstVosk(STTGstBase):
         if self._vosk is None:
             LOG_MSG.error("no Vosk element!")
 
-        self._bus_id = self.bus.connect("message", self.__handle_message)
+        self._bus_id = self.bus.connect("message::element", self.__handle_vosk_message)
 
         if current_locale is None:
             self._current_locale = stt_current_locale()
@@ -175,12 +175,7 @@ class STTGstVosk(STTGstBase):
         # There is no final results when not playing or paused
         self._parse_json(self._vosk.get_property("final-results"))
 
-    def __handle_message (self, bus, message):
-        msg_type = message.type
-
-        if msg_type != Gst.MessageType.ELEMENT:
-            return
-
+    def __handle_vosk_message (self, bus, message):
         msg_struct = message.get_structure ()
         struct_name = msg_struct.get_name ()
         if struct_name is None or struct_name != "vosk":

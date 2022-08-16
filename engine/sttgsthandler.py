@@ -39,9 +39,12 @@ class STTGstHandler(GObject.Object):
         super().__init__()
 
         self._pipeline=None
-        self._state_id=0
+        self._model_changed_id=0
         self._result_id=0
-        self._bus_id=0
+        self._bus_state_changed_id=0
+        self._bus_async_done_id=0
+        self._bus_error_id=0
+        self._bus_warning_id=0
 
     def __del__(self):
         LOG_MSG.info("GstHandler destroyed")
@@ -65,31 +68,40 @@ class STTGstHandler(GObject.Object):
     def __connect(self):
         self.__disconnect()
 
-        if self._state_id == 0:
-            self._state_id=self._pipeline.connect("model-changed", self._model_changed)
+        if self._model_changed_id == 0:
+            self._model_changed_id=self._pipeline.connect("model-changed", self._model_changed)
 
         if self._result_id == 0:
             self._result_id=self._pipeline.connect("result", self._got_result)
 
-        if self._bus_id != 0:
+        if self._bus_state_changed_id != 0:
             return
 
-        self._bus_id = self._pipeline.bus.connect("message", self.__handle_message)
+        self._bus_state_changed_id = self._pipeline.bus.connect("message::state-changed", self.__handle_state_changed_message)
+        self._bus_async_done_id = self._pipeline.bus.connect("message::async-done", self.__handle_async_done_message)
+        self._bus_error_id = self._pipeline.bus.connect("message::error", self.__handle_error_message)
+        self._bus_warning_id = self._pipeline.bus.connect("message::warning", self.__handle_warning_message)
 
     def __disconnect(self):
-        if self._state_id != 0:
-            self._pipeline.disconnect(self._state_id)
-            self._state_id = 0
+        if self._model_changed_id != 0:
+            self._pipeline.disconnect(self._model_changed_id)
+            self._model_changed_id = 0
 
         if self._result_id != 0:
             self._pipeline.disconnect(self._result_id)
             self._result_id = 0
 
-        if self._bus_id == 0:
+        if self._bus_state_changed_id == 0:
             return
 
-        self._pipeline.bus.disconnect(self._bus_id)
-        self._bus_id = 0
+        self._pipeline.bus.disconnect(self._bus_state_changed_id)
+        self._pipeline.bus.disconnect(self._bus_async_done_id)
+        self._pipeline.bus.disconnect(self._bus_error_id)
+        self._pipeline.bus.disconnect(self._bus_warning_id)
+        self._bus_state_changed_id = 0
+        self._bus_sync_done_id = 0
+        self._bus_error_id = 0
+        self._bus_warning_id = 0
 
     def _got_result(self, pipeline, msg_name, data):
         self.emit(msg_name, data)
@@ -97,23 +109,29 @@ class STTGstHandler(GObject.Object):
     def _model_changed(self, pipeline):
         self.emit("model-changed")
 
-    def __handle_message (self, bus, message):
-        msg_type = message.type
+    def __handle_state_changed_message (self, bus, message):
+        (old_state, new_state, pending) = message.parse_state_changed ()
+        LOG_MSG.debug("state changed from %s to %s (%s)", old_state, new_state, message.src)
 
-        # Inform of the change
-        if msg_type == Gst.MessageType.STATE_CHANGED:
-            (old_state, new_state, pending) = message.parse_state_changed ()
-            LOG_MSG.debug("state changed from %s to %s (%s)", old_state, new_state, message.src)
+        # The signal can trigger some functions that are time consuming,
+        # especially if they are called several times in a short while.
+        # So, only emit the signal if the state is paused or playing and if the
+        # whole pipeline's state changed.
+        if new_state in [Gst.State.PAUSED, Gst.State.PLAYING] and \
+           message.src == self._pipeline.pipeline:
             self.emit("state")
-        elif msg_type == Gst.MessageType.ASYNC_DONE:
-            LOG_MSG.debug("async state change")
-            self.emit("state")
-        elif msg_type == Gst.MessageType.ERROR:
-            error, debug = message.parse_error()
-            LOG_MSG.error("message (%s), %s", error.message, debug)
-        elif msg_type == Gst.MessageType.WARNING:
-            error, debug = message.parse_warning()
-            LOG_MSG.warning("message (%s), %s", error.message, debug)
+
+    def __handle_async_done_message (self, bus, message):
+        LOG_MSG.debug("async state change")
+        self.emit("state")
+
+    def __handle_error_message (self, bus, message):
+        error, debug = message.parse_error()
+        LOG_MSG.error("message (%s), %s", error.message, debug)
+
+    def __handle_warning_message (self, bus, message):
+        warning, debug = message.parse_warning()
+        LOG_MSG.warning("message (%s), %s", warning.message, debug)
 
     def is_running (self):
         if self._pipeline == None:

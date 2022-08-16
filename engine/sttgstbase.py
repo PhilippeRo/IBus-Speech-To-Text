@@ -49,7 +49,7 @@ class STTGstBase (GObject.Object):
         self._buffer_id = 0 # GLib.timeout_add(100, self._print_buffer)
 
         self._bus = self._pipeline.get_bus()
-        self._bus.add_signal_watch()
+        self._bus.add_signal_watch_full(GLib.PRIORITY_LOW)
 
         self._target=STTEngineState.UNKNOWN
 
@@ -138,11 +138,7 @@ class STTGstBase (GObject.Object):
         return True
 
     def _run_real(self):
-        ret = self._pipeline.set_state (Gst.State.PLAYING)
-        LOG_MSG.info("tried to start pipeline %s", ret)
-        if ret == Gst.StateChangeReturn.FAILURE:
-            LOG_MSG.error("failed to run pipeline")
-            return False
+        self._pipeline.call_async(Gst.Element.set_state, Gst.State.PLAYING)
 
         # Note: we might not be ready yet if vosk is loading model.
         # In this case, wait for message ASYNC_DONE

@@ -255,6 +255,7 @@ class STTEngine(IBus.Engine):
         self.update_property(prop)
 
     def _state_changed(self, engine):
+        # Be careful that we don't call this too often
         self._update_state()
 
     def _model_changed(self, engine):
@@ -312,6 +313,7 @@ class STTEngine(IBus.Engine):
             self._engine.get_final_results()
 
         if prop_name == 'toggle-recording':
+            # State will be updated by the engine
             if bool(state) == True:
                 self._engine.run()
             else:
@@ -340,8 +342,6 @@ class STTEngine(IBus.Engine):
                             license_type=Gtk.License.GPL_3_0,
                             translator_credits=_("translator-credits"))
             dialog.present()
-
-        self._update_state()
 
     def _got_partial_text(self, engine, utterance):
         if (self.client_capabilities & IBus.Capabilite.PREEDIT_TEXT) == 0:
