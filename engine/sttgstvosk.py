@@ -32,20 +32,30 @@ LOG_MSG=logging.getLogger()
 class STTGstVosk(STTGstBase):
     __gtype_name__ = 'STTGstVosk'
 
+    #"removesilence remove=true minimum-silence-time=3000000000 squash=true silent=false ! " \
+    #"removesilence remove=true minimum-silence-time=1000000000 threshold=-40 squash=true silent=false ! " \
     #slave-method=3 /                   "queue max-size-bytes=4294967295 ! " \
-    _pipeline_def="pulsesrc blocksize=4410 ! " \
+
+    _pipeline_def="pulsesrc blocksize=19200 ! " \
+                  "audio/x-raw,format=S16LE,rate=48000,channels=1 ! " \
+                  "webrtcdsp noise-suppression-level=3 echo-cancel=false ! " \
                   "queue2 max-size-bytes=4294967294 name=Buffer max-size-time=0 max-size-buffers=0 ! " \
-                  "audioconvert ! " \
-                  "audiorate ! " \
-                  "audioresample ! " \
-                  "audio/x-raw,format=S16LE," \
-                              "rate=44100," \
-                              "channels=1 ! " \
                   "vosk name=VoskMain ! " \
                   "fakesink"
 
+    _pipeline_def_alt="pulsesrc blocksize=19200 ! " \
+                      "audio/x-raw,format=S16LE,rate=48000,channels=1 ! " \
+                      "queue2 max-size-bytes=4294967294 name=Buffer max-size-time=0 max-size-buffers=0 ! " \
+                      "vosk name=VoskMain ! " \
+                      "fakesink"
     def __init__(self, current_locale=None):
-        super().__init__(pipeline_definition=STTGstVosk._pipeline_def)
+        plugin=Gst.Registry.get().find_plugin("webrtcdsp")
+        if plugin is not None:
+            super().__init__(pipeline_definition=STTGstVosk._pipeline_def)
+            LOG_MSG.debug("using Webrtcdsp plugin")
+        else:
+            super().__init__(pipeline_definition=STTGstVosk._pipeline_def_alt)
+            LOG_MSG.debug("not using Webrtcdsp plugin")
 
         if self.pipeline is None:
             LOG_MSG.error("pipeline was not created")
