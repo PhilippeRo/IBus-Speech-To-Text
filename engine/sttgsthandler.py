@@ -42,7 +42,6 @@ class STTGstHandler(GObject.Object):
         self._model_changed_id=0
         self._result_id=0
         self._bus_state_changed_id=0
-        self._bus_async_done_id=0
         self._bus_error_id=0
         self._bus_warning_id=0
 
@@ -78,7 +77,6 @@ class STTGstHandler(GObject.Object):
             return
 
         self._bus_state_changed_id = self._pipeline.bus.connect("message::state-changed", self.__handle_state_changed_message)
-        self._bus_async_done_id = self._pipeline.bus.connect("message::async-done", self.__handle_async_done_message)
         self._bus_error_id = self._pipeline.bus.connect("message::error", self.__handle_error_message)
         self._bus_warning_id = self._pipeline.bus.connect("message::warning", self.__handle_warning_message)
 
@@ -95,11 +93,9 @@ class STTGstHandler(GObject.Object):
             return
 
         self._pipeline.bus.disconnect(self._bus_state_changed_id)
-        self._pipeline.bus.disconnect(self._bus_async_done_id)
         self._pipeline.bus.disconnect(self._bus_error_id)
         self._pipeline.bus.disconnect(self._bus_warning_id)
         self._bus_state_changed_id = 0
-        self._bus_sync_done_id = 0
         self._bus_error_id = 0
         self._bus_warning_id = 0
 
@@ -120,10 +116,6 @@ class STTGstHandler(GObject.Object):
         if new_state in [Gst.State.PAUSED, Gst.State.PLAYING] and \
            message.src == self._pipeline.pipeline:
             self.emit("state")
-
-    def __handle_async_done_message (self, bus, message):
-        LOG_MSG.debug("async state change")
-        self.emit("state")
 
     def __handle_error_message (self, bus, message):
         error, debug = message.parse_error()

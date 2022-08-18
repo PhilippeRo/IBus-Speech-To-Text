@@ -447,8 +447,8 @@ class STTEngine(IBus.Engine):
         # is included.
         text_bytes=ibus_text.get_text().encode()
         self._left_text=text_bytes[:cursor_pos].decode("utf-8")
-        LOG_MSG.debug("left text changed (%s) (cursor pos=%i, anchor_pos=%i)",
-                      ibus_text.get_text(), cursor_pos, anchor_pos)
+        LOG_MSG.debug("left text changed (%s) (cursor pos=%i)",
+                      ibus_text.get_text(), cursor_pos)
 
         # Reminder we do not care about the context on the right, it is up to
         # the user to add a potential missing whitespace.
