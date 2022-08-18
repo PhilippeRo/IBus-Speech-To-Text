@@ -38,6 +38,7 @@ class STTGstBase (GObject.Object):
     __gsignals__ = {
         'result': (GObject.SIGNAL_RUN_FIRST, None, (str, object,)),
         'model-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
+        'state-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
     }
 
     def __init__(self, pipeline_definition):
@@ -50,6 +51,9 @@ class STTGstBase (GObject.Object):
 
         self._bus = self._pipeline.get_bus()
         self._bus.add_signal_watch_full(GLib.PRIORITY_LOW)
+        self._bus_error_id = self._bus.connect("message::error", self._handle_error_message)
+        self._bus_warning_id = self._bus.connect("message::warning", self._handle_warning_message)
+        self._bus_state_changed_id = self.bus.connect("message::state-changed", self._handle_state_changed_message)
 
         self._target=STTEngineState.UNKNOWN
 
@@ -60,6 +64,13 @@ class STTGstBase (GObject.Object):
         if self._buffer_id:
             GLib.source_remove(self._buffer_id)
             self._buffer_id=0
+
+        self._bus.disconnect(self._bus_error_id)
+        self._bus.disconnect(self._bus_warning_id)
+        self._bus.disconnect(self._bus_state_changed_id)
+        self._bus_error_id = 0
+        self._bus_warning_id = 0
+        self._bus_state_changed_id = 0
 
         self._bus.remove_signal_watch()
         self._bus=None
@@ -77,8 +88,28 @@ class STTGstBase (GObject.Object):
     def bus(self):
         return self._bus
 
+    def _handle_error_message (self, bus, message):
+        error, debug = message.parse_error()
+        LOG_MSG.error("message (%s), %s", error.message, debug)
+
+    def _handle_warning_message (self, bus, message):
+        warning, debug = message.parse_warning()
+        LOG_MSG.warning("message (%s), %s", warning.message, debug)
+
+    def _handle_state_changed_message (self, bus, message):
+        (old_state, new_state, pending) = message.parse_state_changed ()
+        LOG_MSG.debug("state changed from %s to %s (%s)", old_state, new_state, message.src)
+
+        # The signal can trigger some functions that are time consuming,
+        # especially if they are called several times in a short while.
+        # So, only emit the signal if the state is paused or playing and if the
+        # whole pipeline's state changed.
+        if new_state in [Gst.State.PAUSED, Gst.State.PLAYING] and \
+           message.src == self._pipeline:
+            self.emit("state-changed")
+
     def __get_state(self, strict):
-        if self._pipeline == None:
+        if self._pipeline is None:
             LOG_MSG.error('no pipeline')
             return STTEngineState.UNKNOWN
 

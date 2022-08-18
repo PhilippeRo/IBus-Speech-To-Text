@@ -41,9 +41,7 @@ class STTGstHandler(GObject.Object):
         self._pipeline=None
         self._model_changed_id=0
         self._result_id=0
-        self._bus_state_changed_id=0
-        self._bus_error_id=0
-        self._bus_warning_id=0
+        self._state_changed_id=0
 
     def __del__(self):
         LOG_MSG.info("GstHandler destroyed")
@@ -73,12 +71,8 @@ class STTGstHandler(GObject.Object):
         if self._result_id == 0:
             self._result_id=self._pipeline.connect("result", self._got_result)
 
-        if self._bus_state_changed_id != 0:
-            return
-
-        self._bus_state_changed_id = self._pipeline.bus.connect("message::state-changed", self.__handle_state_changed_message)
-        self._bus_error_id = self._pipeline.bus.connect("message::error", self.__handle_error_message)
-        self._bus_warning_id = self._pipeline.bus.connect("message::warning", self.__handle_warning_message)
+        if self._state_changed_id == 0:
+            self._state_changed_id = self._pipeline.connect("state-changed", self._state_changed)
 
     def __disconnect(self):
         if self._model_changed_id != 0:
@@ -89,15 +83,9 @@ class STTGstHandler(GObject.Object):
             self._pipeline.disconnect(self._result_id)
             self._result_id = 0
 
-        if self._bus_state_changed_id == 0:
-            return
-
-        self._pipeline.bus.disconnect(self._bus_state_changed_id)
-        self._pipeline.bus.disconnect(self._bus_error_id)
-        self._pipeline.bus.disconnect(self._bus_warning_id)
-        self._bus_state_changed_id = 0
-        self._bus_error_id = 0
-        self._bus_warning_id = 0
+        if self._state_changed_id != 0:
+            self._pipeline.disconnect(self._state_changed_id)
+            self._state_changed_id = 0
 
     def _got_result(self, pipeline, msg_name, data):
         self.emit(msg_name, data)
@@ -105,25 +93,8 @@ class STTGstHandler(GObject.Object):
     def _model_changed(self, pipeline):
         self.emit("model-changed")
 
-    def __handle_state_changed_message (self, bus, message):
-        (old_state, new_state, pending) = message.parse_state_changed ()
-        LOG_MSG.debug("state changed from %s to %s (%s)", old_state, new_state, message.src)
-
-        # The signal can trigger some functions that are time consuming,
-        # especially if they are called several times in a short while.
-        # So, only emit the signal if the state is paused or playing and if the
-        # whole pipeline's state changed.
-        if new_state in [Gst.State.PAUSED, Gst.State.PLAYING] and \
-           message.src == self._pipeline.pipeline:
-            self.emit("state")
-
-    def __handle_error_message (self, bus, message):
-        error, debug = message.parse_error()
-        LOG_MSG.error("message (%s), %s", error.message, debug)
-
-    def __handle_warning_message (self, bus, message):
-        warning, debug = message.parse_warning()
-        LOG_MSG.warning("message (%s), %s", warning.message, debug)
+    def _state_changed(self, pipeline):
+        self.emit("state")
 
     def is_running (self):
         if self._pipeline == None:
