@@ -310,11 +310,8 @@ class STTEngine(IBus.Engine):
         self._reset()
 
     def do_property_activate(self, prop_name, state):
-        # Make sure that we are not in the middle of an analysis.
-        # If we changed the mode during analysis it would affect the next
-        # analysis (partial or not) and make it wrong.
-        if self._text_processor.is_processing() == True:
-            self._engine.get_final_results()
+        # Reminder: no need to call final_results() since do_reset()
+        # do_focus_out() is called.
 
         if prop_name == 'toggle-recording':
             # State will be updated by the engine
@@ -361,6 +358,8 @@ class STTEngine(IBus.Engine):
         # So we finalize first then get on with the deletion to avoid its
         # repetition.
         # Note: it does not matter that pending_cancel_size is reset to 0
+        # after checking it since, it is not 0, it will be reset to proper value
+        # since final_results() triggers the final analysis of the utterance.
         if self._text_processor.pending_cancel_size == 0:
             # Note: we accept "" (in case we need to remove previous partial text)
             ibus_text=IBus.Text.new_from_string(utterance)
@@ -402,15 +401,20 @@ class STTEngine(IBus.Engine):
             self.commit_text(IBus.Text.new_from_string(text))
             self._left_text+=text
             self._left_text_reset=False
-            LOG_MSG.debug("current left text (after commit) (%s)", self._left_text)
+            #LOG_MSG.debug("current left text (after commit) (%s)", self._left_text)
 
     def _reset(self):
-        if self._engine.is_running():
-            self._engine.get_final_results()
+        # Reminder don't call final_results() or when the window is focused out,
+        # the new window will get the final result.
+        # Let the partial text be committed instead ? But in this case we need
+        # to reset the current analysis to avoid the new window to have the text
+        # In the current situation, the new window continue the voice
+        # recognition as if nothing has happened.
 
-        self._text_processor.reset()
+        # Reset left text since the window might have changed
         self._left_text=""
         self._left_text_reset=True
+
         # Note: we used to do this in the hope it would force update but there
         # is a potential problem here: select text and click -> the selected
         # text is deleted !!
@@ -443,15 +447,13 @@ class STTEngine(IBus.Engine):
         # is included.
         text_bytes=ibus_text.get_text().encode()
         self._left_text=text_bytes[:cursor_pos].decode("utf-8")
-        LOG_MSG.debug("set left text (%s) (cursor pos=%i)", self._left_text, cursor_pos)
+        LOG_MSG.debug("left text changed (%s) (cursor pos=%i, anchor_pos=%i)",
+                      ibus_text.get_text(), cursor_pos, anchor_pos)
 
         # Reminder we do not care about the context on the right, it is up to
         # the user to add a potential missing whitespace.
 
     def do_set_surrounding_text(self, ibus_text, cursor_pos, anchor_pos):
-        LOG_MSG.debug("left text changed (%s) (cursor pos=%i, anchor_pos=%i)",
-                      ibus_text.get_text(), cursor_pos, anchor_pos)
-
         if self._left_text_reset == True:
             self._set_left_text(ibus_text, cursor_pos)
 
