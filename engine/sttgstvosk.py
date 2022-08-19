@@ -48,6 +48,7 @@ class STTGstVosk(STTGstBase):
                       "queue2 max-size-bytes=4294967294 name=Buffer max-size-time=0 max-size-buffers=0 ! " \
                       "vosk name=VoskMain ! " \
                       "fakesink"
+
     def __init__(self, current_locale=None):
         plugin=Gst.Registry.get().find_plugin("webrtcdsp")
         if plugin is not None:
@@ -92,6 +93,7 @@ class STTGstVosk(STTGstBase):
 
         self.bus.disconnect(self._bus_id)
         self._bus_id = 0
+
         self._vosk = None
 
         LOG_MSG.info("Vosk.destroy() called")
@@ -157,13 +159,13 @@ class STTGstVosk(STTGstBase):
         partial_text = json_data.get("partial")
         if partial_text != None:
             if partial_text != "":
-                self.emit("result", "partial-text", partial_text)
+                self.emit("partial-text", partial_text)
             return
 
         text = json_data.get("text")
         if text != None:
             if text != "":
-                self.emit("result", "text", text)
+                self.emit("text", text)
             return
 
         json_alternatives = json_data.get("alternatives")
@@ -177,7 +179,7 @@ class STTGstVosk(STTGstBase):
 
             # Apparently this is pythonic to check if list is empty or not
             if text_alternatives:
-                self.emit("result", "alternatives", text_alternatives)
+                self.emit("alternatives", text_alternatives)
         else:
             LOG_MSG.error("unreadable json answer")
 

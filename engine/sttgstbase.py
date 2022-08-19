@@ -36,13 +36,17 @@ class STTGstBase (GObject.Object):
     __gtype_name__='STTGstBase'
 
     __gsignals__ = {
-        'result': (GObject.SIGNAL_RUN_FIRST, None, (str, object,)),
+        'text': (GObject.SIGNAL_RUN_FIRST, None, (str,)),
+        'partial-text': (GObject.SIGNAL_RUN_FIRST, None, (str,)),
+        'alternatives': (GObject.SIGNAL_RUN_FIRST, None, (object,)),
         'model-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
         'state-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
     }
 
     def __init__(self, pipeline_definition):
         super().__init__()
+        self._users_num=1
+
         self._pipeline = Gst.parse_launch(pipeline_definition)
         if self._pipeline is None:
             LOG_MSG.error("no pipeline")
@@ -79,6 +83,14 @@ class STTGstBase (GObject.Object):
         self._pipeline=None
 
         LOG_MSG.info("GstBase.destroy() called")
+
+    def hold(self):
+        self._users_num += 1
+
+    def release(self):
+        self._users_num -= 1
+        if self._users_num == 0:
+            self.destroy()
 
     @property
     def pipeline(self):

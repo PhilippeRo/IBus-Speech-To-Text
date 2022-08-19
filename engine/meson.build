@@ -5,7 +5,6 @@ stt_sources = [
     'sttgstvosk.py',
     'sttgstfactory.py',
     'sttgstbase.py',
-    'sttgsthandler.py',
     'sttsegmentprocess.py',
     'sttconfigdialog.py',
     'sttlocalerow.py',

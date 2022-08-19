@@ -37,7 +37,6 @@ from sttcurrentlocale import stt_current_locale
 from sttvoskmodelmanagers import stt_vosk_online_model_manager
 
 from sttgstvosk import STTGstVosk
-from sttgsthandler import STTGstHandler
 
 LOG_MSG=logging.getLogger()
 
@@ -121,15 +120,10 @@ class STTConfigDialog (Adw.PreferencesWindow):
         # This updates _valid_formatting_file and _valid_override_file
         self._load_utterances()
 
-        # This is to force some preloading for the recognition engine whatever
-        # the settings for "preloading" or "active-on-start"
-        self._engine = STTGstHandler()
-
-        pipeline=STTGstVosk(current_locale=self._current_locale)
+        # Force preloading for the recognition engine whatever the DCONF settings
+        self._engine=STTGstVosk(current_locale=self._current_locale)
         self._engine.connect("model-changed", self._engine_model_changed_cb)
-
-        self._engine.set_pipeline(pipeline)
-        pipeline.preload()
+        self._engine.preload()
 
         LOG_MSG.debug("model exists %s", self._engine.has_model())
 

@@ -115,7 +115,7 @@ class STTEngine(IBus.Engine):
                                               tooltip=_("Learn more about IBus STT")))
 
         self._engine_connected=False
-        self._engine=stt_gst_factory_default().new_handler()
+        self._engine=stt_gst_factory_default().new_engine()
         if self._engine.has_model() == False:
             LOG_MSG.error("engine has no valid model")
 
@@ -165,7 +165,7 @@ class STTEngine(IBus.Engine):
 
         # we need to do that since _engine might live on if preloaded
         self._disconnect_from_engine()
-        self._engine.destroy()
+        self._engine.release()
         self._engine = None
 
         # This function needs CHAINING and this way or it leaks
