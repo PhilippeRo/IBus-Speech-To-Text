@@ -79,7 +79,7 @@ class STTShortcutDialog(Gtk.Dialog):
 
         self._engine=engine
         engine.connect("model-changed", self._model_changed_cb)
-        engine.connect("state", self._state_changed_cb)
+        engine.connect("state-changed", self._state_changed_cb)
         if engine.has_model() == False:
             self.recognize_toggle.set_sensitive(False)
         self._update_recognize_button()

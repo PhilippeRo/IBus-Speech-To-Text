@@ -29,7 +29,7 @@ class STTGstHandler(GObject.Object):
     __gsignals__ = {
         'destroy': (GObject.SIGNAL_RUN_FIRST, None, ()),
         'model-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
-        'state': (GObject.SIGNAL_RUN_FIRST, None, ()),
+        'state-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
         'text': (GObject.SIGNAL_RUN_FIRST, None, (str,)),
         'partial-text': (GObject.SIGNAL_RUN_FIRST, None, (str,)),
         'alternatives': (GObject.SIGNAL_RUN_FIRST, None, (object,))
@@ -56,7 +56,7 @@ class STTGstHandler(GObject.Object):
             self._pipeline=pipeline
 
             if self._pipeline.is_running() != old_pipeline.is_running():
-                self.emit("state")
+                self.emit("state-changed")
         else:
             self._pipeline=pipeline
 
@@ -94,7 +94,7 @@ class STTGstHandler(GObject.Object):
         self.emit("model-changed")
 
     def _state_changed(self, pipeline):
-        self.emit("state")
+        self.emit("state-changed")
 
     def is_running (self):
         if self._pipeline == None:

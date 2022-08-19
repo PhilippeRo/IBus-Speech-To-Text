@@ -145,7 +145,7 @@ class STTEngine(IBus.Engine):
 
         LOG_MSG.debug("connect to engine %s", self)
         self._engine.connect("model-changed", self._model_changed)
-        self._engine.connect("state", self._state_changed)
+        self._engine.connect("state-changed", self._state_changed)
         self._engine.connect("text", self._got_text)
 
         if self._preedit_text == True:
