@@ -1,0 +1,16 @@
+0.3.0 Release
+This release should fix some bugs and bring some performance gains (especially when starting voice recognition).
+
+Changes since 0.2.0:
+- Code reorganisation, remove useless code, pruning
+- Rework Gstreamer pipeline to improve its efficiency
+- Add an optional plugin (webrtcdsp from plugins-bad) to normalize and remove noise
+- Try to improve handling of surrounding text
+- Improve startup smoothness when button to start recognition is clicked
+- Fix use of diacritics with some applications
+- Improve the way we keep track of surrounding text
+- Use the same rules as English for auto-formatting, which will allow all languages to have some default formatting
+- engine: Correct license in About dialogue (Jan Tojnar)
+- build: Only use Meson post install script (Jan Tojnar)
+- Add spec file for RPM package
+- Generate Python bytecode in install directory
