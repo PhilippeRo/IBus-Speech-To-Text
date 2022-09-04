@@ -35,17 +35,15 @@ class STTGstVosk(STTGstBase):
     #"removesilence remove=true minimum-silence-time=3000000000 squash=true silent=false ! " \
     #"removesilence remove=true minimum-silence-time=1000000000 threshold=-40 squash=true silent=false ! " \
     #slave-method=3 /                   "queue max-size-bytes=4294967295 ! " \
-
-    _pipeline_def="pulsesrc blocksize=19200 ! " \
-                  "audio/x-raw,format=S16LE,rate=48000,channels=1 ! " \
+    #"queue2 max-size-bytes=4294967294 name=Buffer max-size-time=0 max-size-buffers=0 ! " \
+    _pipeline_def="pulsesrc blocksize=3200 buffer-time=9223372036854775807 ! " \
+                  "audio/x-raw,format=S16LE,rate=16000,channels=1 ! " \
                   "webrtcdsp noise-suppression-level=3 echo-cancel=false ! " \
-                  "queue2 max-size-bytes=4294967294 name=Buffer max-size-time=0 max-size-buffers=0 ! " \
                   "vosk name=VoskMain ! " \
                   "fakesink"
 
-    _pipeline_def_alt="pulsesrc blocksize=19200 ! " \
-                      "audio/x-raw,format=S16LE,rate=48000,channels=1 ! " \
-                      "queue2 max-size-bytes=4294967294 name=Buffer max-size-time=0 max-size-buffers=0 ! " \
+    _pipeline_def_alt="pulsesrc blocksize=3200 buffer-time=9223372036854775807 ! " \
+                      "audio/x-raw,format=S16LE,rate=16000,channels=1 ! " \
                       "vosk name=VoskMain ! " \
                       "fakesink"
 
