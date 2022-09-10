@@ -289,7 +289,6 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
         # If we don't have text on the left use our last segment's last word
         # (which may be "").
         if text_left != "":
-            LOG_MSG.info(" there is text on the left (%s)", text_left)
             self._text_left = text_left
         else:
             self._text_left = self._last_segment._last_word

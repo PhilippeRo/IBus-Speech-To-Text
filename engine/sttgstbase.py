@@ -181,6 +181,7 @@ class STTGstBase (GObject.Object):
         return True
 
     def _run_real(self):
+        # Call set_state asynchronously
         self._pipeline.call_async(Gst.Element.set_state, Gst.State.PLAYING)
 
         # Note: we might not be ready yet if vosk is loading model.
@@ -232,7 +233,7 @@ class STTGstBase (GObject.Object):
     def do_model_changed(self):
         if self.has_model() == False:
             if self._target == STTEngineState.RUNNING:
-                LOG_MSG.debug("model changed, adjusting state to target (PAUSED)")
+                LOG_MSG.debug("model changed to NULL, adjusting state to target (PAUSED)")
                 self._stop_real()
         else:
             if self._target == STTEngineState.RUNNING:
