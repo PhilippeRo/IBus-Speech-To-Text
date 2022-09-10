@@ -54,6 +54,7 @@ Building
 To install it in /usr (where most distributions install IBus):
 ```
   meson setup builddir --prefix=/usr
+  cd builddir
   meson compile
   meson install
 ```
