@@ -113,7 +113,16 @@ class STTGstVosk(STTGstBase):
             return
 
         LOG_MSG.debug("new Vosk model %s", new_model_path)
+
+        ret, state, pending=self.pipeline.get_state(0)
+        if state >= Gst.State.READY:
+            self.pipeline.set_state(Gst.State.READY)
+
+        # Model can only be changed when in READY state
         self._vosk.set_property ("speech-model", new_model_path)
+
+        if state >= Gst.State.READY:
+            self.pipeline.set_state(state)
 
         # Warn of our state change
         self.emit("model-changed")
@@ -183,7 +192,7 @@ class STTGstVosk(STTGstBase):
 
     def get_final_results(self):
         # There is no final results when not playing or paused
-        self._parse_json(self._vosk.get_property("final-results"))
+        self._parse_json(self._vosk.get_property("current-final-results"))
 
     def __handle_vosk_message (self, bus, message):
         msg_struct = message.get_structure ()
