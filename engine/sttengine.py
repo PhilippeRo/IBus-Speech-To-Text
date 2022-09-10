@@ -63,7 +63,6 @@ class STTEngine(IBus.Engine):
         self._settings.connect("changed::format-preedit", self._on_format_preedit_changed)
         self._preedit_text=self._settings.get_boolean("preedit-text")
         self._format_preedit=self._settings.get_boolean("format-preedit")
-        self._partial_text_id=0
 
         self.__prop_list=IBus.PropList()
         self.__prop_list.append(IBus.Property(key="toggle-recording",
@@ -131,10 +130,7 @@ class STTEngine(IBus.Engine):
         self._engine.disconnect_by_func(self._model_changed)
         self._engine.disconnect_by_func(self._state_changed)
         self._engine.disconnect_by_func(self._got_text)
-
-        if self._partial_text_id != 0:
-            self._engine.disconnect(self._partial_text_id)
-            self._partial_text_id=0
+        self._engine.disconnect_by_func(self._got_partial_text)
 
         self._engine_connected=False
 
@@ -147,10 +143,8 @@ class STTEngine(IBus.Engine):
         self._engine.connect("model-changed", self._model_changed)
         self._engine.connect("state-changed", self._state_changed)
         self._engine.connect("text", self._got_text)
-
-        if self._preedit_text == True:
-            self._partial_text_id=self._engine.connect("partial-text", self._got_partial_text)
-
+        self._engine.connect("partial-text", self._got_partial_text)
+        self._engine.set_use_partial_results(self._preedit_text)
         self._engine_connected=True
 
     def do_destroy (self):
@@ -179,14 +173,7 @@ class STTEngine(IBus.Engine):
 
     def _update_preedit_text(self):
         self._preedit_text=self._settings.get_boolean("preedit-text")
-        if self._partial_text_id != 0:
-            if self._preedit_text == True:
-                return
-
-            self._engine.disconnect(self._partial_text_id)
-            self._partial_text_id=0
-        elif self._preedit_text == True:
-            self._partial_text_id=self._engine.connect("partial-text", self._got_partial_text)
+        self._engine.set_use_partial_results(self._preedit_text)
 
     def _on_preedit_text_changed(self, settings, key):
         self._update_preedit_text()
@@ -352,11 +339,12 @@ class STTEngine(IBus.Engine):
         if self._format_preedit == True:
             utterance = self._text_processor.utterance_process_begin(utterance, self._left_text)
 
-        # Problem here is that we cannot perform any cancellation while we are
-        # in the middle of an analysis or it could be repeated the next time
-        # we perform another analysis of another partial utterance.
-        # So we finalize first then get on with the deletion to avoid its
-        # repetition.
+        # If pending_cancel_size is not 0, then it means we need to delete text
+        # on the left which is not possible while handling partial results.
+        # We cannot perform any such deletion while we are in the middle of the
+        # analysis of a partial utterance or it could be repeated the next time
+        # we perform another analysis of the partial utterance.
+        # So we need to do it as fast as possible and trigger a result to get on
         # Note: it does not matter that pending_cancel_size is reset to 0
         # after checking it since, it is not 0, it will be reset to proper value
         # since final_results() triggers the final analysis of the utterance.

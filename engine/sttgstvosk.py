@@ -202,6 +202,12 @@ class STTGstVosk(STTGstBase):
 
         self._parse_json(msg_struct.get_string ("current-result"))
 
+    def set_use_partial_results(self, active):
+        if active is False:
+            self._vosk.set_property("partial-results-interval", -1)
+        else:
+            self._vosk.set_property("partial-results-interval", 0)
+
     def set_alternatives_num(self, num):
         self._vosk.set_property("alternatives", num)
 
