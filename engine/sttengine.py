@@ -357,7 +357,7 @@ class STTEngine(IBus.Engine):
                                                IBus.PreeditFocusMode.CLEAR)
             self._preediting=True
         else:
-            self._engine.get_final_results()
+            self._engine.get_results()
 
     def _got_text(self, engine, utterance):
         text = self._text_processor.utterance_process_end(utterance, self._left_text)

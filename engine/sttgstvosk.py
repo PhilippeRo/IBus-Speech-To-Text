@@ -194,6 +194,10 @@ class STTGstVosk(STTGstBase):
         # There is no final results when not playing or paused
         self._parse_json(self._vosk.get_property("current-final-results"))
 
+    def get_results(self):
+        # There is no results when not playing or paused
+        self._parse_json(self._vosk.get_property("current-results"))
+
     def __handle_vosk_message (self, bus, message):
         msg_struct = message.get_structure ()
         struct_name = msg_struct.get_name ()
