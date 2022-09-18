@@ -285,6 +285,8 @@ class STTEngine(IBus.Engine):
 
     def do_focus_in(self):
         LOG_MSG.debug("focus in")
+        # This is needed since IBus 1.5.28 to trigger an update of surrounding text
+        (ibus_text, cursor_pos, anchor_pos)=self.get_surrounding_text()
         self.register_properties(self.__prop_list)
         self._update_state()
 
