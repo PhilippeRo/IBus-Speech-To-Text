@@ -132,7 +132,7 @@ class IMApplication(Gio.Application):
         self.__factory.add_engine("stt", GObject.type_from_name("STTEngine"))
 
         if self.__exec_by_ibus:
-            self.__bus.request_name(stt_utils_get_ibus_name(), 0)
+            self.__bus.request_name("org.freedesktop.IBus.STT", 0)
         else:
             xml_path=stt_utils_ibus_component_description_path()
             self.__component = IBus.Component.new_from_file(xml_path)

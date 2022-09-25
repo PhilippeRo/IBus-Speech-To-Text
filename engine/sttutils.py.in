@@ -24,12 +24,8 @@ import gi
 from gi.repository import GLib
 from gi.repository import Gio
 
-
 def stt_utils_get_ibus_name():
     return "org.freedesktop.IBus.STT"
-
-def stt_utils_get_ibus_path():
-    return "/org/freedesktop/IBus/STT"
 
 def stt_utils_get_local_config_path():
     return os.path.join(GLib.get_user_config_dir(), "@project_name@")
