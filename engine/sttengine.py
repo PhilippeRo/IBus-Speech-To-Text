@@ -36,13 +36,29 @@ from sttutils import *
 from sttgstfactory import stt_gst_factory_default
 from sttsegmentprocess import STTSegmentProcess, STTParseModes
 
+
+__all__ = (
+    "STTEngine"
+)
+
+GLib.set_prgname('ibus-engine-stt')
+
 LOG_MSG=logging.getLogger()
 
 class STTEngine(IBus.Engine):
     __gtype_name__ = 'STTEngine'
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, bus, object_path):
+        if hasattr(IBus.Engine.props, 'has_focus_id'):
+            LOG_MSG.info("STTEngine has focus-in-id capabilities")
+            # FIXME: hopefully ibus 1.5.28 will have property needs_surrounding_text
+            super().__init__(connection=bus.get_connection(),
+                             object_path=object_path,
+                             has_focus_id=True)
+        else:
+            LOG_MSG.info("STTEngine has NO focus-in-id capabilities")
+            super().__init__(connection=bus.get_connection(),
+                             object_path=object_path)
 
         LOG_MSG.info("STTEngine created %s", self)
 
@@ -259,6 +275,7 @@ class STTEngine(IBus.Engine):
         LOG_MSG.info('enable %s', self)
 
         # Necessary to indicate we'll use surrounding text
+        # FIXME: hopefully ibus 1.5.28 will have property needs_surrounding_text
         (ibus_text, cursor_pos, anchor_pos)=self.get_surrounding_text()
         self._set_left_text(ibus_text, cursor_pos)
 
@@ -285,13 +302,21 @@ class STTEngine(IBus.Engine):
 
     def do_focus_in(self):
         LOG_MSG.debug("focus in")
-        # This is needed since IBus 1.5.28 to trigger an update of surrounding text
+        self.do_focus_in_id("", "")
+
+    def do_focus_in_id(self, object_path, client):
+        LOG_MSG.debug("focus in id %s %s", object_path, client)
+        # FIXME: hopefully ibus 1.5.28 will have property needs_surrounding_text
         (ibus_text, cursor_pos, anchor_pos)=self.get_surrounding_text()
         self.register_properties(self.__prop_list)
         self._update_state()
 
     def do_focus_out(self):
         LOG_MSG.debug("focus out")
+        self.do_focus_out_id("")
+
+    def do_focus_out_id(self, object_path):
+        LOG_MSG.debug("focus out id")
         self._reset()
 
     def do_reset(self):

@@ -35,7 +35,7 @@ from gi.repository import GObject
 from gi.repository import Gst
 
 from sttutils import *
-from sttengine import STTEngine
+from sttenginefactory import STTEngineFactory
 from sttgstfactory import stt_gst_factory_default
 
 LOG_MSG=logging.getLogger()
@@ -128,7 +128,7 @@ class IMApplication(Gio.Application):
         self.__bus = IBus.Bus()
         self.__bus.connect("disconnected", self.__bus_disconnected_cb)
 
-        self.__factory = IBus.Factory.new(self.__bus.get_connection())
+        self.__factory = STTEngineFactory(self.__bus)
         self.__factory.add_engine("stt", GObject.type_from_name("STTEngine"))
 
         if self.__exec_by_ibus:

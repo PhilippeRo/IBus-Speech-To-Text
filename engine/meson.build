@@ -1,6 +1,7 @@
 stt_sources = [
     'main.py',
     'mainconfig.py',
+    'sttenginefactory.py',
     'sttengine.py',
     'sttgstvosk.py',
     'sttgstfactory.py',
