@@ -1,5 +1,5 @@
 Name:   ibus-stt
-Version:  0.3.0
+Version:  0.4.0
 Release:  1%{?dist}
 Summary:  A speech to text IBus Input Method using VOSK
 BuildArch:  noarch
@@ -20,7 +20,7 @@ Requires:    python3-dbus
 Requires:    python3-babel
 Requires:    gstreamer-1
 Requires:    gobject-introspection
-Requires:    gst-vosk
+Requires:    gst-vosk >= 0.3.0
 Requires:    glib2
 Requires:    gtk4
 Requires:    libadwaita
