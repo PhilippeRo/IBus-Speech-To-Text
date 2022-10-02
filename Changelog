@@ -1,3 +1,7 @@
+0.4.0
+Adapt to 0.3.0 version of gst-vosk
+Rework (and simplify) the pipeline
+
 0.3.0 Release
 This release should fix some bugs and bring some performance gains (especially when starting voice recognition).
 
