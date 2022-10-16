@@ -25,7 +25,7 @@ ibusdir = datadir / 'ibus' / 'component'
 ibus_dep = dependency ('ibus-1.0',
                        version: '>= 1.5.0')
 
-dependency('libadwaita-1', version: '>= 1.0')
+dependency('libadwaita-1', version: '>= 1.2')
 
 gnome.post_install(
   glib_compile_schemas: true,

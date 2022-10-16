@@ -4,11 +4,16 @@
   <template class="STTShortcutDialog" parent="GtkDialog">
     <property name="modal">True</property>
     <property name="title" translatable="yes">Shortcut Editing</property>
+    <property name="default-height">600</property>
+    <property name="default-width">600</property>
     <child>
       <object class="GtkScrolledWindow">
         <property name="hscrollbar-policy">never</property>
         <property name="propagate-natural-height">1</property>
         <property name="child">
+          <object class="GtkViewport" id="main_viewport">
+            <property name="scroll-to-focus">True</property>
+            <property name="child">
           <object class="GtkStack" id="contents">
             <property name="hexpand">1</property>
             <property name="vexpand">1</property>
@@ -95,37 +100,6 @@
           </child>
 
           <child>
-            <object class="GtkStackPage" id="page2">
-              <property name="name">utterance</property>
-              <property name="child">
-                <object class="GtkBox">
-                  <property name="hexpand">1</property>
-                  <property name="vexpand">1</property>
-                  <property name="margin-start">18</property>
-                  <property name="margin-end">18</property>
-                  <property name="margin-top">18</property>
-                  <property name="margin-bottom">18</property>
-                  <property name="orientation">vertical</property>
-                  <property name="spacing">6</property>
-                  <child>
-                    <object class="GtkLabel">
-                      <property name="hexpand">1</property>
-                      <property name="xalign">0</property>
-                      <property name="label" translatable="yes">Type a new utterance or correct the existing one</property>
-                    </object>
-                  </child>
-                  <child>
-                    <object class="GtkEntry" id="utterance_entry">
-                      <property name="hexpand">1</property>
-                      <property name="secondary-icon-activatable">0</property>
-                    </object>
-                  </child>
-                </object>
-              </property>
-            </object>
-          </child>
-
-          <child>
             <object class="GtkStackPage" id="page3">
               <property name="name">utterance_recognition</property>
               <property name="child">
@@ -187,6 +161,8 @@
             </object>
           </child>
           </object><!-- stack-->
+            </property>
+          </object>
         </property>
       </object>
     </child>
@@ -233,17 +209,7 @@
             <child>
                <object class="GtkButton" id="add_utterance_button">
                 <property name="label" translatable="yes">Add Utterance</property>
-                <signal name="clicked" handler="add_utterance_button_clicked_cb"/>
-                <style>
-                  <class name="suggested-action" />
-                </style>
-              </object>
-            </child>
-
-            <child>
-               <object class="GtkButton" id="apply_utterance_button">
-                <property name="label" translatable="yes">Apply Changes</property>
-                 <signal name="clicked" handler="apply_utterance_button_clicked_cb"/>
+                <signal name="clicked" handler="add_alternative_utterance_button_clicked_cb"/>
                 <style>
                   <class name="suggested-action" />
                 </style>

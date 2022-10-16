@@ -1,23 +1,38 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <interface>
   <requires lib="gtk+" version="4.0"/>
-  <template class="STTUtteranceRow" parent="AdwActionRow">
-    <property name="selectable">False</property>
-    <property name="activatable">True</property>
+  <template class="STTUtteranceRow" parent="AdwEntryRow">
 
-    <child>
-      <object class="GtkButton" id="delete_button">
-        <property name="hexpand">True</property>
-        <property name="halign">end</property>
-        <property name="valign">center</property>
-        <property name="icon_name">edit-clear-symbolic</property>
-        <signal name="clicked" handler="delete_button_clicked_cb"/>
-        <style>
-          <class name="circular"/>
-          <class name="flat"/>
-        </style>
-      </object>
-    </child>
+    <child type="suffix">
+      <object class="GtkBox">
+        <property name="orientation">horizontal</property>
+        <child>
+          <object class="GtkImage" id="valid_image">
+            <property name="visible">False</property>
+            <property name="icon_name">dialog-warning-symbolic</property>
+            <property name="tooltip-text">The utterance already exists</property>
+            <style>
+              <class name="circular"/>
+              <class name="flat"/>
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton" id="delete_button">
+            <property name="hexpand">False</property>
+            <property name="halign">end</property>
+            <property name="valign">center</property>
+            <property name="can-focus">False</property>
+            <property name="icon_name">edit-clear-symbolic</property>
+            <signal name="clicked" handler="delete_button_clicked_cb"/>
+            <style>
+              <class name="circular"/>
+              <class name="flat"/>
+            </style>
+          </object>
+        </child>
+    </object>
+  </child>
 
   </template>
 </interface>
