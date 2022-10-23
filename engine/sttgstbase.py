@@ -31,6 +31,7 @@ class STTEngineState(Enum):
     READY = 1
     LOADED = 2
     RUNNING = 3
+    ERROR = 4
 
 class STTGstBase (GObject.Object):
     __gtype_name__='STTGstBase'
@@ -51,8 +52,6 @@ class STTGstBase (GObject.Object):
         if self._pipeline is None:
             LOG_MSG.error("no pipeline")
 
-        self._buffer_id = 0 # GLib.timeout_add(100, self._print_buffer)
-
         self._bus = self._pipeline.get_bus()
         self._bus.add_signal_watch_full(GLib.PRIORITY_LOW)
         self._bus_error_id = self._bus.connect("message::error", self._handle_error_message)
@@ -65,10 +64,6 @@ class STTGstBase (GObject.Object):
         LOG_MSG.info("GstBase __Del__")
 
     def destroy (self):
-        if self._buffer_id:
-            GLib.source_remove(self._buffer_id)
-            self._buffer_id=0
-
         self._bus.disconnect(self._bus_error_id)
         self._bus.disconnect(self._bus_warning_id)
         self._bus.disconnect(self._bus_state_changed_id)
@@ -123,12 +118,12 @@ class STTGstBase (GObject.Object):
     def __get_state(self, strict):
         if self._pipeline is None:
             LOG_MSG.error('no pipeline')
-            return STTEngineState.UNKNOWN
+            return STTEngineState.ERROR
 
         ret, state, pending = self._pipeline.get_state (0)
         if ret == Gst.StateChangeReturn.FAILURE:
             LOG_MSG.info("pipeline get_state failure")
-            return STTEngineState.UNKNOWN
+            return STTEngineState.ERROR
 
         if ret == Gst.StateChangeReturn.ASYNC:
             if strict == True:
@@ -153,10 +148,9 @@ class STTGstBase (GObject.Object):
         if self.has_model() == False:
             return False
 
-        return bool(self.__get_state(False) == STTEngineState.RUNNING)
-
-    def is_loaded (self):
-        return bool(self.__get_state(False) == STTEngineState.LOADED)
+        state = self.__get_state(False)
+        return bool(state == STTEngineState.RUNNING or \
+                   (state == STTEngineState.LOADED and self._target == STTEngineState.RUNNING))
 
     def preload (self):
         if self._pipeline == None:
@@ -239,11 +233,3 @@ class STTGstBase (GObject.Object):
             if self._target == STTEngineState.RUNNING:
                 LOG_MSG.debug("model changed, adjusting state to target (RUNNING)")
                 self._run_real()
-
-    def _print_buffer(self):
-        print("Buffer level is",
-              self._pipeline.get_by_name("Buffer").get_property("current-level-time")/1000000000.0,
-              self._pipeline.get_by_name("Buffer").get_property("current-level-bytes"),
-              self._pipeline.get_by_name("Buffer").get_property("current-level-buffers"))
-
-        return True
