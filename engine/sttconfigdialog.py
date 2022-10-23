@@ -585,3 +585,4 @@ class STTConfigDialog (Adw.PreferencesWindow):
         elif self._no_model_toast != None:
             self._no_model_toast.dismiss()
             self._no_model_toast = None
+
