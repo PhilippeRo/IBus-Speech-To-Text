@@ -36,25 +36,20 @@ class STTShortcutDialog(Gtk.Dialog):
 
     add_button=Gtk.Template.Child()
     apply_button=Gtk.Template.Child()
-    add_utterance_button=Gtk.Template.Child()
-    previous_button=Gtk.Template.Child()
     cancel_button=Gtk.Template.Child()
 
     text_view=Gtk.Template.Child()
     description_entry = Gtk.Template.Child()
 
-    button_stack_start=Gtk.Template.Child()
     button_stack_end=Gtk.Template.Child()
 
     utterance_list=Gtk.Template.Child()
 
     text_label=Gtk.Template.Child()
 
-    contents=Gtk.Template.Child()
     header=Gtk.Template.Child()
 
-    alternatives_list=Gtk.Template.Child()
-    recognize_toggle=Gtk.Template.Child()
+    new_alternative_utterances_button=Gtk.Template.Child()
 
     def __init__(self, row=None, engine=None, **kwargs):
         super().__init__(**kwargs)
@@ -65,22 +60,21 @@ class STTShortcutDialog(Gtk.Dialog):
         self._changes=0
         self._rows_list=[]
 
-        self.button_stack_start.set_visible_child(self.cancel_button)
+        self.connect("response",self._response)
 
         buffer=self.text_view.get_buffer()
         buffer.connect("notify::text", self._value_text_changed)
 
-        # I don't know why but we need this ??? Otherwise it does not show up.
+        # FIXME: I don't know why but we need this ??? Otherwise it does not show up.
         self.set_titlebar(self.header)
 
         self._engine=engine
         engine.connect("model-changed", self._model_changed_cb)
         engine.connect("state-changed", self._state_changed_cb)
         if engine.has_model() == False:
-            self.recognize_toggle.set_sensitive(False)
+            self.new_alternative_utterances_button.set_sensitive(False)
         self._update_recognize_button()
 
-        self._alternative_rows=[]
         self._recognition_id=0
 
         if row == None:
@@ -124,6 +118,10 @@ class STTShortcutDialog(Gtk.Dialog):
         for utterance in unique_utterances:
             utterance_row=STTUtteranceRow(text=utterance, editable=bool(utterance not in row.utterances))
             self._add_utterance_row(utterance_row)
+
+    def _response (self, dialog, response_type):
+        # Make sure any recognition is stopped when dialog is about to be closed
+        self._stop_recognition()
 
     def _delete_utterance(self, utterance):
         num_rows=self._added_temp.get(utterance, 0)
@@ -249,77 +247,12 @@ class STTShortcutDialog(Gtk.Dialog):
         self._add_utterance_row(utterance_row)
         utterance_row.grab_focus()
 
-    @Gtk.Template.Callback()
-    def new_alternative_utterances_button_clicked_cb(self, button):
-        self.contents.set_visible_child_name("utterance_recognition")
-        self.button_stack_start.set_visible_child(self.previous_button)
-        self.button_stack_end.set_visible_child(self.add_utterance_button)
-        self.set_default_widget(self.add_utterance_button)
-
-        for row in self._alternative_rows:
-            self.alternatives_list.remove(row)
-        self._alternative_rows=[]
-
-        self.add_utterance_button.set_sensitive(False)
-        self.recognize_toggle.grab_focus()
-
-    def display_global_page(self):
-        self.contents.set_visible_child_name("global")
-        self.button_stack_start.set_visible_child(self.cancel_button)
-
-        if self._row == None:
-            self.button_stack_end.set_visible_child(self.add_button)
-            self.set_default_widget(self.add_button)
-        else:
-            self.button_stack_end.set_visible_child(self.apply_button)
-            self.set_default_widget(self.apply_button)
-
-        for row in self._alternative_rows:
-            self.alternatives_list.remove(row)
-
-        self._alternative_rows=[]
-        self._stop_recognition()
-
-    @Gtk.Template.Callback()
-    def previous_button_clicked_cb(self, button):
-        self.display_global_page()
-
-    def _add_alternative_utterance(self, utterance):
-        # Utterance can't be in _added_temp (we checked it while it was typed)
-        # AND the row has no previous value (contrary to what can happen in
-        # apply_utterance_row_button_clicked_cb())
-        if self._removed_temp.get(utterance) == True:
-            self._removed_temp.pop(utterance)
-        else:
-            self._added_temp[utterance]=True
-
-        utterance_row=STTUtteranceRow(text=utterance, editable=bool(utterance not in self.utterances))
-        self._add_utterance_row(utterance_row)
-
-    # Used when the row is added from a list of results returned after recognition
-    @Gtk.Template.Callback()
-    def add_alternative_utterance_button_clicked_cb(self, button):
-        for row in self._alternative_rows:
-            # Check if the row is selected by checking the presence of an icon
-            if row.get_icon_name() not in [None,""]:
-                self.alternatives_list.remove(row)
-                continue
-
-            self._add_alternative_utterance(row.get_title())
-            self.alternatives_list.remove(row)
-
-        self._alternative_rows=[]
-
-        self._update_add_apply_buttons_state()
-        self.display_global_page()
-
     def utterance_text_changed(self, utterance_row):
         if utterance_row.editing == False:
             return
 
         utterance = utterance_row.get_text()
         show_warning = self._check_utterance_existence(utterance_row, utterance)
-
         utterance_row.valid_image.set_visible(show_warning)
 
     def _update_add_apply_buttons_state(self):
@@ -381,66 +314,28 @@ class STTShortcutDialog(Gtk.Dialog):
 
         self._engine.stop()
 
-    def _new_alternative_utterance_row_delete_clicked_cb(self, button):
-        row=button.get_parent()
-        while not isinstance(row, Adw.ActionRow):
-            row=row.get_parent()
-            if row == None:
-                return
-
-        self.alternatives_list.remove(row)
-        self._alternative_rows.remove(row)
-        if len(self._alternative_rows) == 0:
-            self.add_utterance_button.set_sensitive(False)
-
     def _alternatives_cb(self, engine, alternatives):
         LOG_MSG.debug("alternatives utterances")
-
-        for row in self._alternative_rows:
-            self.alternatives_list.remove(row)
-
-        self._alternative_rows=[]
-
-        num_valid_utterances = 0
         for utterance in alternatives:
-            row=Adw.ActionRow()
-
-            row.set_title(utterance)
-            delete_button=Gtk.Button()
-            delete_button.set_icon_name("edit-clear-symbolic")
-            delete_button.set_property("hexpand", True)
-            delete_button.set_property("halign", Gtk.Align.END)
-            delete_button.set_property("valign", Gtk.Align.CENTER)
-            style_context=delete_button.get_style_context()
-            style_context.add_class("circular")
-            style_context.add_class("flat")
-            delete_button.connect("clicked", self._new_alternative_utterance_row_delete_clicked_cb)
-            row.add_suffix(delete_button)
-
-            self.alternatives_list.append(row)
-            self._alternative_rows.append(row)
-
             # Check if utterance exists
-            if self._check_utterance_existence(None, utterance) == False:
-                num_valid_utterances += 1
-            else:
-                row.set_icon_name("dialog-warning-symbolic")
-                row.set_subtitle("The utterance already exists")
+            if self._check_utterance_existence(None, utterance) == True:
+                continue
+
+            utterance_row=STTUtteranceRow(text=utterance, editable=True)
+            self._add_utterance_row(utterance_row)
+            self._add_utterance(utterance)
+
+        self._update_add_apply_buttons_state()
 
         self._stop_recognition()
 
-        if num_valid_utterances > 0:
-            self.add_utterance_button.set_sensitive(True)
-
     def _update_recognize_button(self):
-        if self._engine.is_running() == True:
-            self.recognize_toggle.set_icon_name("media-playback-stop-symbolic")
+        if self._engine.is_running():
+            self.new_alternative_utterances_button.set_icon_name("media-playback-stop-symbolic")
         elif self._engine.has_model() == True:
-            self.recognize_toggle.set_icon_name("microphone-sensitivity-high-symbolic")
+            self.new_alternative_utterances_button.set_icon_name("microphone-sensitivity-high-symbolic")
         else:
-            spinner=Gtk.Spinner()
-            self.recognize_toggle.set_child(spinner)
-            spinner.start()
+            self.new_alternative_utterances_button.set_icon_name("microphone-sensitivity-muted-symbolic")
 
     def _state_changed_cb(self, engine):
         self._update_recognize_button()
@@ -452,21 +347,13 @@ class STTShortcutDialog(Gtk.Dialog):
             self._stop_recognition()
             return
 
-        self.add_utterance_button.set_sensitive(False)
-
-        for row in self._alternative_rows:
-            self.alternatives_list.remove(row)
-
-        self._alternative_rows=[]
-
         self._recognition_id=self._engine.connect("alternatives", self._alternatives_cb)
         self._engine.set_alternatives_num(5)
-
         self._engine.run()
 
     def _model_changed_cb(self, engine):
         self._update_recognize_button()
-        self.recognize_toggle.set_sensitive(self._engine.has_model())
+        self.new_alternative_utterances_button.set_sensitive(self._engine.has_model())
 
     # Called by STTConfigDialog to update a STTShortcutRow
     def apply_to_row(self):
