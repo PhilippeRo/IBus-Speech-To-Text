@@ -51,6 +51,8 @@ class STTShortcutDialog(Gtk.Dialog):
 
     new_alternative_utterances_button=Gtk.Template.Child()
 
+    scrolled_window=Gtk.Template.Child()
+
     def __init__(self, row=None, engine=None, **kwargs):
         super().__init__(**kwargs)
 
@@ -245,6 +247,19 @@ class STTShortcutDialog(Gtk.Dialog):
     def new_utterance_button_clicked_cb(self, button):
         utterance_row=STTUtteranceRow()
         self._add_utterance_row(utterance_row)
+
+        # The problem here is that scroll to focus does not seem to work.
+        # So do it manually.
+        # There is an additional difficulty, at this point, utterance_row is
+        # mapped and realized but its height is still 0. So only do it if
+        # there at least 1 row in the list ( all rows have the same height).
+        if len(self._rows_list) != 0:
+            row1=self._rows_list[0]
+            adjustment=self.scrolled_window.get_vadjustment()
+            upper=adjustment.get_upper()+row1.get_allocated_height()
+            adjustment.set_upper(upper)
+            adjustment.set_value(upper)
+
         utterance_row.grab_focus()
 
     def utterance_text_changed(self, utterance_row):

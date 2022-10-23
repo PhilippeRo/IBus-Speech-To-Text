@@ -7,7 +7,7 @@
     <property name="default-height">600</property>
     <property name="default-width">600</property>
     <child>
-      <object class="GtkScrolledWindow">
+      <object class="GtkScrolledWindow" id="scrolled_window">
         <property name="hscrollbar-policy">never</property>
         <property name="propagate-natural-height">1</property>
         <property name="child">
