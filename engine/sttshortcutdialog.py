@@ -65,7 +65,7 @@ class STTShortcutDialog(Gtk.Dialog):
         buffer=self.text_view.get_buffer()
         buffer.connect("notify::text", self._value_text_changed)
 
-        # FIXME: I don't know why but we need this ??? Otherwise it does not show up.
+        # We need this; Otherwise our titlebar does not show up.
         self.set_titlebar(self.header)
 
         self._engine=engine
