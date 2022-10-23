@@ -29,7 +29,7 @@ gi.require_version('Pango', '1.0')
 gi.require_version('Gtk', '4.0')
 
 from gi.repository import IBus
-from gi.repository import Gtk
+from gi.repository import Gtk, Adw
 from gi.repository import Gio
 
 from sttutils import *
@@ -347,13 +347,13 @@ class STTEngine(IBus.Engine):
         elif prop_name == 'configuration':
             subprocess.Popen([os.path.join(stt_utils_get_libexec(), "ibus-setup-stt")])
         elif prop_name == 'about':
-            dialog = Gtk.AboutDialog(program_name=_("IBus Speech To Text"),
+            dialog = Adw.AboutWindow(application_name=_("IBus Speech To Text"),
                             title=_("About IBus Speech To Text"),
-                            logo_icon_name="user-available-symbolic",
+                            application_icon="user-available-symbolic",
                             version=stt_utils_get_version(),
                             copyright="Copyright © 2022 Philippe Rouquier",
                             comments=_("What you say is always write."),
-                            website="https://github.com/PhilippeRo/ibus-stt",
+                            website="https://github.com/PhilippeRo/IBus-Speech-To-Text",
                             license_type=Gtk.License.GPL_3_0,
                             translator_credits=_("translator-credits"))
             dialog.present()

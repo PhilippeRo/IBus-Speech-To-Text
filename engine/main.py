@@ -27,9 +27,11 @@ import gi
 
 gi.require_version('Gst', '1.0')
 gi.require_version('IBus', '1.0')
+gi.require_version('Adw', '1')
 
 from gi.repository import IBus
 from gi.repository import GLib
+from gi.repository import Adw
 from gi.repository import Gio
 from gi.repository import GObject
 from gi.repository import Gst
@@ -40,14 +42,12 @@ from sttgstfactory import stt_gst_factory_default
 
 LOG_MSG=logging.getLogger()
 
-class IMApplication(Gio.Application):
+class IMApplication(Adw.Application):
     __gtype_name__ = 'IMApplication'
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         LOG_MSG.info("Init")
-        super().__init__(application_id=stt_utils_get_app_id(),
-                         flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE|
-                               Gio.ApplicationFlags.ALLOW_REPLACEMENT)
+        super().__init__(**kwargs)
 
         self.__exec_by_ibus=False
         self.__daemonize=False
@@ -162,9 +162,12 @@ if __name__ == "__main__":
     locale.bindtextdomain('ibus-stt', None)
     locale.textdomain('ibus-stt')
 
-    app = IMApplication()
-
     Gst.init(sys.argv)
+    Adw.init()
+
+    app = IMApplication(application_id=stt_utils_get_app_id(),
+                        flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE|
+                              Gio.ApplicationFlags.ALLOW_REPLACEMENT)
 
     # This is for debugging threads
     #from hanging_threads import start_monitoring
