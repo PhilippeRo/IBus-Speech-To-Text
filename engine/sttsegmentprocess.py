@@ -30,10 +30,11 @@ LOG_MSG=logging.getLogger()
 
 class STTSegment():
     def __init__(self, segment=None):
-        if segment != None:
+        if segment is not None:
             self._diacritic=segment._diacritic
             self._last_word=""
             self._utterance=""
+            self._shortcuts=[]
         else:
             self._reset()
 
@@ -42,10 +43,13 @@ class STTSegment():
     def _reset(self):
         self._diacritic=None
         self._last_word=""
-        self._utterance = ""
+        self._utterance=""
+        self._shortcuts=[]
 
     def is_empty(self):
-        if self._diacritic == None and self._utterance == "":
+        if self._diacritic == None and \
+           self._utterance == "" and \
+           self._shortcuts in [None,[]]:
             return True
 
         return False
@@ -86,6 +90,11 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
 
     __gsignals__ = {
         "mode-changed": (GObject.SIGNAL_RUN_FIRST, None, ()),
+        "need-results" : (GObject.SIGNAL_RUN_FIRST, None, ()),
+        "cancel": (GObject.SIGNAL_RUN_FIRST, None, (int,)),
+        "shortcut": (GObject.SIGNAL_RUN_FIRST, None, (str,)),
+        "partial-text": (GObject.SIGNAL_RUN_FIRST, None, (str,)),
+        "final-text": (GObject.SIGNAL_RUN_FIRST, None, (str,)),
     }
 
     def __init__(self):
@@ -100,7 +109,7 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
         self._init_text()
 
     def _update_caps(self):
-        # Update our capacities
+        # Update our capabilities
         if self._parser.formatting_file_valid == False:
             # Spelling is impossible
             self.can_spell=False
@@ -174,11 +183,14 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
         if (self._context._case & STTCase.LOCK) == 0:
             self._context._case=STTCase.NONE
 
-        if self._segment.is_empty() == True:
+        if self._segment.is_empty() is True:
+            # The current segment is empty which means the cancelling word was
+            # the first pronounced or that there was a succession of cancelling
+            # words in the utterance.
             # Remove previous segment from "parents", keep its size around.
 
             # _previous == None should not happen
-            if self._segment._previous._previous != None:
+            if self._segment._previous._previous is not None:
                 # When previous segment is None it means that we reached the
                 # first bogus segment that contains the left text set by the
                 # the engine.
@@ -191,9 +203,6 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
         # Update the context from the previous segment.
         # Reminder: diacritics are set to None
         self._text_left=self._segment._previous._last_word
-
-        # TODO See if it would be possible to have two commands "cancel previous
-        # word" / "cancel previous segment"
 
     # STTParserInterface method
     def set_case(self, case):
@@ -219,6 +228,12 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
     # STTParserInterface method
     def add_words(self, words):
         self._append_words(words)
+
+    def add_shortcut(self, shortcut_str):
+        # Get the size of current formatted utterance to remember where the
+        # shortcut is.
+        position=len(self._segment._utterance)
+        self._segment._shortcuts.append((position, shortcut_str))
 
     def _append_word(self, word):
         if self.mode == STTParseModes.SPELLING:
@@ -249,7 +264,7 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
         elif (self._context._case & STTCase.CAPITAL) != 0:
             word=word.capitalize()
 
-        if self._segment._diacritic != None:
+        if self._segment._diacritic is not None:
             # Diacritics should be placed after the letter or some applications
             # like libreoffice will not combine the diacritic and the letter.
             letter=word[:1]
@@ -293,6 +308,7 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
         else:
             self._text_left = self._last_segment._last_word
 
+        LOG_MSG.debug("left text", self._text_left)
         words = utterance.split()
         max_words = len(words)
         word_i = 0
@@ -321,17 +337,47 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
     def utterance_process_begin(self, utterance, text_left):
         self._utterance_process(utterance, text_left)
 
-        if self._segment._diacritic != None:
-            return self._segment._utterance + self._segment._diacritic[0]
+        if self._segment._diacritic is not None:
+             self._segment._utterance =+ self._segment._diacritic[0]
 
-        return self._segment._utterance
+        # If pending_cancel_size is not 0, then it means we need to delete text
+        # on the left which is not possible while handling partial results.
+        # We cannot perform any such deletion while we are in the middle of the
+        # analysis of a partial utterance or it could be repeated the next time
+        # we perform another analysis of the partial utterance.
+        # So we need to do it as fast as possible and trigger a result to get on
+        # Note: it does not matter that pending_cancel_size is reset to 0
+        # after checking it since, it is not 0, it will be reset to proper value
+        # since final_results() triggers the final analysis of the utterance.
+        # Then, there is no need to send new partial text as the result would
+        # not reflect the current state.
+        if self._pending_cancel_size != 0 or self._segment._shortcuts not in [None,[]]:
+            self._pending_cancel_size=0
+            self.emit("need-results")
+        else:
+            self.emit("partial-text", self._segment._utterance)
 
     def utterance_process_end(self, utterance, text_left):
         self._utterance_process(utterance, text_left)
         text = self._segment._utterance
 
+        if self._pending_cancel_size != 0:
+            self.emit("cancel", self._pending_cancel_size)
+            self._pending_cancel_size=0
+
+        if self._segment._shortcuts not in [None,[]]:
+            position=0
+            for shortcut in self._segment._shortcuts:
+                if shortcut[0] != position:
+                    position=shortcut[0]
+                    self.emit("final-text", text[:position])
+                    text=text[position:]
+                self.emit("shortcut", shortcut[1])
+
+        self.emit("final-text", text)
+
         # If utterance is empty (no text, no diacritics), don't keep segment.
-        if self._segment.is_empty() == False:
+        if self._segment.is_empty() is False:
             self._last_segment=self._segment
         else:
             self._last_segment=self._segment._previous
@@ -340,4 +386,3 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
 
         self._context._first = None
         self._context._last = None
-        return text

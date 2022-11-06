@@ -63,6 +63,9 @@ class STTParserInterface():
     def add_words(self, words):
         self.add_words(words)
 
+    def add_shortcut(self, words):
+        self.add_shortcut(words)
+
 class STTNodeType (IntFlag):
     NONE            = 0
     OVERRIDDEN      = 1
@@ -191,25 +194,52 @@ class STTUtteranceTree(GObject.Object):
             node._value = value
             node._modes = node_modes
 
-    def _build_replacements_list(self, item_list, node_modes):
+    def _load_replacements_list(self, item_list):
         if item_list == None:
             return
 
         for item in item_list:
-            value = item.get("value")
-
             # In case there is only one
             utterances = item.get("utterances")
             if isinstance(utterances,str):
                 utterances = [utterances]
 
-            self._add_utterances_to_tree(utterances, STTParserInterface.add_words, value, node_modes)
-
-    def _load_replacements_list(self, item_list):
-        self._build_replacements_list(item_list, STTParseModes.DICTATION)
+            value = item.get("value")
+            if value is None:
+                value = item.get("shortcut")
+                if value is None:
+                    LOG_MSG.error("Utterance with no value")
+                    return
+                self._add_utterances_to_tree(utterances,
+                                             STTParserInterface.add_shortcut,
+                                             value,
+                                             STTParseModes.DICTATION)
+            else:
+                self._add_utterances_to_tree(utterances,
+                                             STTParserInterface.add_words,
+                                             value,
+                                             STTParseModes.DICTATION)
 
     def _load_punctuation_list(self, item_list):
-        self._build_replacements_list(item_list, STTParseModes.SPELLING | STTParseModes.DICTATION)
+        if item_list == None:
+            return
+
+        for item in item_list:
+            # In case there is only one
+            utterances = item.get("utterances")
+            if isinstance(utterances,str):
+                utterances = [utterances]
+
+            value = item.get("value")
+            if value is None:
+                LOG_MSG.error("Utterance with no value")
+                return
+
+            self._add_utterances_to_tree(utterances,
+                                         STTParserInterface.add_words,
+                                         value,
+                                         STTParseModes.SPELLING |
+                                         STTParseModes.DICTATION)
 
     def _load_diacritics_list(self, item_list):
         if item_list == None:

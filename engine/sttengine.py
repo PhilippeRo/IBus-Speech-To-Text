@@ -60,10 +60,15 @@ class STTEngine(IBus.Engine):
             super().__init__(connection=bus.get_connection(),
                              object_path=object_path)
 
-        LOG_MSG.info("STTEngine created %s", self)
+        LOG_MSG.info("STTEngine created %s %i", self, self.get_property("has_focus_id"))
 
         self._text_processor=STTSegmentProcess()
         self._text_processor.connect("mode-changed", self._mode_changed)
+        self._text_processor.connect("need-results", self._need_results)
+        self._text_processor.connect("cancel", self._cancel)
+        self._text_processor.connect("shortcut", self._shortcut)
+        self._text_processor.connect("partial-text", self._partial_formatted_text)
+        self._text_processor.connect("final-text", self._final_formatted_text)
 
         self._left_text=""
         self._left_text_reset=True
@@ -359,36 +364,24 @@ class STTEngine(IBus.Engine):
                             translator_credits=_("translator-credits"))
             dialog.present()
 
-    def _got_partial_text(self, engine, utterance):
-        if (self.client_capabilities & IBus.Capabilite.PREEDIT_TEXT) == 0:
-            LOG_MSG.debug("client has no Preedit capability")
-            return
-
-        if self._format_preedit == True:
-            utterance = self._text_processor.utterance_process_begin(utterance, self._left_text)
-
-        # If pending_cancel_size is not 0, then it means we need to delete text
-        # on the left which is not possible while handling partial results.
-        # We cannot perform any such deletion while we are in the middle of the
-        # analysis of a partial utterance or it could be repeated the next time
-        # we perform another analysis of the partial utterance.
-        # So we need to do it as fast as possible and trigger a result to get on
-        # Note: it does not matter that pending_cancel_size is reset to 0
-        # after checking it since, it is not 0, it will be reset to proper value
-        # since final_results() triggers the final analysis of the utterance.
-        if self._text_processor.pending_cancel_size == 0:
-            # Note: we accept "" (in case we need to remove previous partial text)
-            ibus_text=IBus.Text.new_from_string(utterance)
-            self.update_preedit_text_with_mode(ibus_text,
-                                               0,
-                                               True,
-                                               IBus.PreeditFocusMode.CLEAR)
-            self._preediting=True
-        else:
+    def _need_results(self, text_process):
+        if self._preediting == True:
             self._engine.get_results()
 
-    def _got_text(self, engine, utterance):
-        text = self._text_processor.utterance_process_end(utterance, self._left_text)
+    def _cancel(self, text_process, cancel_size):
+        # Handle potential pending cancellations
+        if (self.client_capabilities & IBus.Capabilite.SURROUNDING_TEXT) == 0:
+            LOG_MSG.debug("client application has no surrounding text capability")
+
+        self.delete_surrounding_text(-cancel_size, cancel_size)
+
+        # Keep our left text updated
+        text_len=len(self._left_text)
+        text_len=text_len-cancel_size if cancel_size <= text_len else text_len
+        self._left_text=self._left_text[:text_len]
+
+    def _shortcut(self, text_process, shortcut):
+        # Shortcut depends on the client, only IBus clients allow it
         if self._preediting == True:
             # Don't call this if there was no preediting before
             self.update_preedit_text_with_mode(IBus.Text.new_from_string(""),
@@ -397,27 +390,53 @@ class STTEngine(IBus.Engine):
                                                IBus.PreeditFocusMode.CLEAR)
             self._preediting=False
 
-        # Handle potential pending cancellations
-        # Note: once accessed pending_cancel_size is reset to 0
-        cancel_length = self._text_processor.pending_cancel_size
-        if cancel_length != 0:
-            if (self.client_capabilities & IBus.Capabilite.SURROUNDING_TEXT) == 0:
-                LOG_MSG.debug("client application has no surrounding text capability")
+        (result,keyval,modifiers)=IBus.key_event_from_string(shortcut)
+        if result is True:
+            self.forward_key_event(keyval, 0, modifiers)
+        else:
+            LOG_MSG.info("unsupported shortcut")
 
-            self.delete_surrounding_text(-cancel_length, cancel_length)
+    def _add_preedit_text(self, utterance):
+        # Note: we accept "" (in case we need to remove previous partial text)
+        ibus_text=IBus.Text.new_from_string(utterance)
+        self.update_preedit_text_with_mode(ibus_text,
+                                           0,
+                                           True,
+                                           IBus.PreeditFocusMode.CLEAR)
+        self._preediting=True
 
-            # Keep our left text updated
-            text_len=len(self._left_text)
-            text_len=text_len-cancel_length if cancel_length <= text_len else text_len
-            self._left_text=self._left_text[:text_len]
+    def _partial_formatted_text(self, text_process, utterance):
+        self._add_preedit_text(utterance)
+
+    def _final_formatted_text(self, text_process, utterance):
+        if self._preediting == True:
+            # Don't call this if there was no preediting before
+            self.update_preedit_text_with_mode(IBus.Text.new_from_string(""),
+                                               0,
+                                               True,
+                                               IBus.PreeditFocusMode.CLEAR)
+            self._preediting=False
 
         # Note : there could be text to write even after cancellation ("cancel
         # write this").
-        if text != "":
-            self.commit_text(IBus.Text.new_from_string(text))
-            self._left_text+=text
+        if utterance != "":
+            self.commit_text(IBus.Text.new_from_string(utterance))
+            self._left_text+=utterance
             self._left_text_reset=False
-            #LOG_MSG.debug("current left text (after commit) (%s)", self._left_text)
+            LOG_MSG.debug("current left text (after commit) (%s)", self._left_text)
+
+    def _got_partial_text(self, engine, utterance):
+        if (self.client_capabilities & IBus.Capabilite.PREEDIT_TEXT) == 0:
+            LOG_MSG.debug("client has no Preedit capability")
+            return
+
+        if self._format_preedit == True:
+            self._text_processor.utterance_process_begin(utterance, self._left_text)
+        else:
+            self._add_preedit_text(utterance)
+
+    def _got_text(self, engine, utterance):
+        self._text_processor.utterance_process_end(utterance, self._left_text)
 
     def _reset(self):
         # Reminder don't call final_results() or when the window is focused out,
@@ -463,8 +482,8 @@ class STTEngine(IBus.Engine):
         # is included.
         text_bytes=ibus_text.get_text().encode()
         self._left_text=text_bytes[:cursor_pos].decode("utf-8")
-        LOG_MSG.debug("left text changed (%s) (cursor pos=%i)",
-                      ibus_text.get_text(), cursor_pos)
+        LOG_MSG.debug("left text changed (%s) (original text=%s / cursor pos=%i)",
+                      self._left_text, ibus_text.get_text(), cursor_pos)
 
         # Reminder we do not care about the context on the right, it is up to
         # the user to add a potential missing whitespace.
