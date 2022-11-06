@@ -20,12 +20,32 @@
     },
     "custom" : [{
         "value": "I",
-        "description": "i -> I",
+        "description": "Replace 'i' by 'I'",
         "utterances": ["i"]
         }, {
         "value": "I'm",
-        "description": "i'm -> I'm",
+        "description": "Replace 'i'm' by 'I'm'",
         "utterances": ["i'm"]
+        }, {
+        "shortcut": "Control+v",
+        "description": "Paste the text",
+        "utterances": ["paste the text"]
+        }, {
+        "shortcut": "Control+BackSpace",
+        "description": "Delete the word on the left",
+        "utterances": ["delete left word"]
+        }, {
+        "shortcut": "Control+z",
+        "description": "Cancel last action",
+        "utterances": ["previous state"]
+        }, {
+        "shortcut": "Return",
+        "description": "Validate (= press 'Enter')",
+        "utterances": ["validate"]
+         }, {
+        "shortcut": "Shift+Control+Delete",
+        "description": "Delete the line",
+        "utterances": ["delete the line"]
         }],
     "commands" : [{
         "value" : "digits",
