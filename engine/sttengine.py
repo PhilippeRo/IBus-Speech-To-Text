@@ -443,12 +443,13 @@ class STTEngine(IBus.Engine):
         # the new window will get the final result.
         # Let the partial text be committed instead ? But in this case we need
         # to reset the current analysis to avoid the new window to have the text
-        # In the current situation, the new window continue the voice
+        # In the current situation, the new window continues the voice
         # recognition as if nothing has happened.
 
         # Reset left text since the window might have changed
         self._left_text=""
         self._left_text_reset=True
+        self._text_processor.reset()
 
         # Note: we used to do this in the hope it would force update but there
         # is a potential problem here: select text and click -> the selected
@@ -480,8 +481,10 @@ class STTEngine(IBus.Engine):
         # Each text commit or preedit may reliably (but not always for example
         # gtk3 and gtk4) sets the surrounding text. Problem is, preedit text
         # is included.
-        text_bytes=ibus_text.get_text().encode()
-        self._left_text=text_bytes[:cursor_pos].decode("utf-8")
+        # Note: at one point only bytes were used but commit in gtk change that
+        # text_bytes=ibus_text.get_text().encode()
+        # self._left_text=text_bytes[:cursor_pos].decode("utf-8")
+        self._left_text=ibus_text.get_text()[:cursor_pos]
         LOG_MSG.debug("left text changed (%s) (original text=%s / cursor pos=%i)",
                       self._left_text, ibus_text.get_text(), cursor_pos)
 
