@@ -308,7 +308,7 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
         else:
             self._text_left = self._last_segment._last_word
 
-        LOG_MSG.debug("left text", self._text_left)
+        LOG_MSG.debug("left text (%s)", self._text_left)
         words = utterance.split()
         max_words = len(words)
         word_i = 0
