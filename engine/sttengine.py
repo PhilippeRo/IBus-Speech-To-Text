@@ -316,6 +316,12 @@ class STTEngine(IBus.Engine):
         self.register_properties(self.__prop_list)
         self._update_state()
 
+        # Shortcut depends on the client, only IBus gtk2/gtk3 clients allow it
+        if client.startswith("gtk3-im:") or client.startswith("gtk2-im:"):
+            self._text_processor.supports_shortcuts=True
+        else:
+            self._text_processor.supports_shortcuts=False
+
     def do_focus_out(self):
         LOG_MSG.debug("focus out")
         self.do_focus_out_id("")
@@ -380,8 +386,7 @@ class STTEngine(IBus.Engine):
         text_len=text_len-cancel_size if cancel_size <= text_len else text_len
         self._left_text=self._left_text[:text_len]
 
-    def _shortcut(self, text_process, shortcut):
-        # Shortcut depends on the client, only IBus clients allow it
+    def _shortcut(self, text_process, keyval, modifiers):
         if self._preediting == True:
             # Don't call this if there was no preediting before
             self.update_preedit_text_with_mode(IBus.Text.new_from_string(""),
@@ -390,11 +395,7 @@ class STTEngine(IBus.Engine):
                                                IBus.PreeditFocusMode.CLEAR)
             self._preediting=False
 
-        (result,keyval,modifiers)=IBus.key_event_from_string(shortcut)
-        if result is True:
-            self.forward_key_event(keyval, 0, modifiers)
-        else:
-            LOG_MSG.info("unsupported shortcut")
+        self.forward_key_event(keyval, 0, modifiers)
 
     def _add_preedit_text(self, utterance):
         # Note: we accept "" (in case we need to remove previous partial text)

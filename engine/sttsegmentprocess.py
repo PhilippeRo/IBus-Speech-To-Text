@@ -19,7 +19,7 @@
 import logging
 import unicodedata
 
-from gi.repository import GObject
+from gi.repository import GObject, IBus
 
 from sttutils import *
 
@@ -92,7 +92,7 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
         "mode-changed": (GObject.SIGNAL_RUN_FIRST, None, ()),
         "need-results" : (GObject.SIGNAL_RUN_FIRST, None, ()),
         "cancel": (GObject.SIGNAL_RUN_FIRST, None, (int,)),
-        "shortcut": (GObject.SIGNAL_RUN_FIRST, None, (str,)),
+        "shortcut": (GObject.SIGNAL_RUN_FIRST, None, (int, int,)),
         "partial-text": (GObject.SIGNAL_RUN_FIRST, None, (str,)),
         "final-text": (GObject.SIGNAL_RUN_FIRST, None, (str,)),
     }
@@ -104,6 +104,8 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
 
         self._context = STTProcessContext()
         self._update_caps()
+
+        self._supports_shortcuts=False
 
         self._text_left=""
         self._init_text()
@@ -131,18 +133,28 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
         self._update_caps()
         self.emit("mode-changed")
 
+    # FIXME: this is unused
     @property
     def pending_cancel_size(self):
         size = self._pending_cancel_size
         self._pending_cancel_size = 0
         return size
 
+    # FIXME: this is unused
     @property
     def segment(self):
         if self._segment != None:
             return self._segment
 
         return self._last_segment
+
+    @property
+    def supports_shorcuts(self):
+        return self._supports_shortcuts
+
+    @supports_shorcuts.setter
+    def supports_shortcuts(self, supports_shortcuts):
+        self._supports_shortcuts=supports_shortcuts
 
     @property
     def mode(self):
@@ -230,10 +242,19 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
         self._append_words(words)
 
     def add_shortcut(self, shortcut_str):
+        if self._supports_shortcuts == False:
+            return False
+
+        (result,keyval,modifiers)=IBus.key_event_from_string(shortcut_str)
+        if result == False:
+            LOG_MSG.info("unsupported shortcut string (%s)", shortcut_str)
+            return False
+
         # Get the size of current formatted utterance to remember where the
         # shortcut is.
         position=len(self._segment._utterance)
-        self._segment._shortcuts.append((position, shortcut_str))
+        self._segment._shortcuts.append((position, keyval, modifiers))
+        return True
 
     def _append_word(self, word):
         if self.mode == STTParseModes.SPELLING:
@@ -372,7 +393,7 @@ class STTSegmentProcess(GObject.GObject, STTParserInterface):
                     position=shortcut[0]
                     self.emit("final-text", text[:position])
                     text=text[position:]
-                self.emit("shortcut", shortcut[1])
+                self.emit("shortcut", shortcut[1], shortcut[2])
 
         self.emit("final-text", text)
 

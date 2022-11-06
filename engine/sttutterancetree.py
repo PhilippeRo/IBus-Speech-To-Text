@@ -46,25 +46,31 @@ class STTCase(IntFlag):
 class STTParserInterface():
     def cancel(self):
         self.cancel()
+        return True
 
     def flip_use_digits(self):
         self.flip_use_digits()
+        return True
 
     def set_mode(self, mode):
         self.set_mode(mode)
+        return True
 
     def set_case(self, case):
         self.set_case(case)
+        return True
 
     def add_diacritic(self, diacritic):
         self.add_diacritic(diacritic)
+        return True
 
     # This one is used for both punctuation and custom
     def add_words(self, words):
         self.add_words(words)
+        return True
 
     def add_shortcut(self, words):
-        self.add_shortcut(words)
+        return self.add_shortcut(words)
 
 class STTNodeType (IntFlag):
     NONE            = 0
@@ -147,9 +153,13 @@ class STTUtteranceTree(GObject.Object):
             return word_i
 
         if node._value != None:
-            node._callback(parser, node._value)
+            result=node._callback(parser, node._value)
         else:
-            node._callback(parser)
+            result=node._callback(parser)
+
+        # In case of an error in the callback, pretend there is nothing
+        if result == False:
+            return word_i
 
         return word_i + node._depth
 
