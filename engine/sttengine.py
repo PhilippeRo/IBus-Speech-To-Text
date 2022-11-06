@@ -322,6 +322,12 @@ class STTEngine(IBus.Engine):
         else:
             self._text_processor.supports_shortcuts=False
 
+        # With recent gtk versions the "focus-in" is not always preceded by a
+        # "reset" signal. Mainly when switching to a gtk4 window with no text.
+        # Reset the left text just to make sure as it is not a time-consuming
+        # function.
+        self._reset()
+
     def do_focus_out(self):
         LOG_MSG.debug("focus out")
         self.do_focus_out_id("")
